@@ -20,6 +20,8 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.menu.MenuConfiguration;
@@ -37,13 +39,10 @@ import java.util.Optional;
 public class MainLayout extends AppLayout {
 
     private H1 viewTitle;
-
     private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
@@ -73,16 +72,27 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
+        // Check if the user is on a mobile device and adjust navigation items accordingly
+        boolean isMobile = isMobileDevice();
+
         List<MenuEntry> menuEntries = MenuConfiguration.getMenuEntries();
         menuEntries.forEach(entry -> {
-            if (entry.icon() != null) {
-                nav.addItem(new SideNavItem(entry.title(), entry.path(), new SvgIcon(entry.icon())));
-            } else {
-                nav.addItem(new SideNavItem(entry.title(), entry.path()));
+            SvgIcon icon = entry.icon() != null ? new SvgIcon(entry.icon()) : null;
+            SideNavItem item = new SideNavItem(entry.title(), entry.path(), icon);
+
+            // Add mobile-specific styling or behavior here if necessary
+            if (isMobile) {
+                item.addClassName("mobile-nav-item");
             }
+            nav.addItem(item);
         });
 
         return nav;
+    }
+
+    public static boolean isMobileDevice() {
+        WebBrowser webBrowser = VaadinSession.getCurrent().getBrowser();
+        return webBrowser.isAndroid() || webBrowser.isIPhone() || webBrowser.isWindowsPhone();
     }
 
     private Footer createFooter() {
