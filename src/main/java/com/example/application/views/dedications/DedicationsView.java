@@ -33,13 +33,9 @@ import java.util.*;
 @PageTitle("Dedications")
 @Route("dedications")
 @Menu(order = 1, icon = "line-awesome/svg/heart-solid.svg")
-@RolesAllowed("ADMIN")
+@RolesAllowed("USER")
 public class DedicationsView extends VerticalLayout {
 
-    public Set<String> categories;
-    public ComboBox<String> songCategoryCmbBox,songCmbBox;
-    public Button saveBtn;
-    public TextArea textArea;
     public VerticalLayout layoutColumn2 = new VerticalLayout();
     private static List<Dedication> listOfDedications = new ArrayList<>();
     private static Grid<Dedication> grid = new Grid<>();
@@ -62,47 +58,8 @@ public class DedicationsView extends VerticalLayout {
     }
     public void createDynamicGrid(){
         this.setupGrid();
-        this.createAddDedicationForm();
+
         this.refreshGrid();
-    }
-    public void createAddDedicationForm(){
-        songCategoryCmbBox = new ComboBox<>("Song Category");
-        songCategoryCmbBox.setWidth(width + "%");
-        songCategoryCmbBox.setHeight("15%");
-        songCategoryCmbBox.setItems(loadSongCategories());
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, songCategoryCmbBox);
-        layoutColumn2.add(songCategoryCmbBox);
-
-        songCategoryCmbBox.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ComboBox<String>, String>>) event -> {
-            Set<String> songsToCmbBox = loadSongTitlesBasedOnCategorie(songCategoryCmbBox.getValue());
-            songCmbBox.setItems(songsToCmbBox);
-        });
-
-        songCmbBox = new ComboBox<>("Song Title");
-        songCmbBox.setWidth(width + "%");
-        songCmbBox.setHeight("15%");
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, songCmbBox);
-        layoutColumn2.add(songCmbBox);
-
-        songCmbBox.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ComboBox<String>, String>>) comboBoxStringComponentValueChangeEvent -> System.out.println(songCmbBox.getValue()));
-
-        textArea = new TextArea("Description");
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, textArea);
-        textArea.setWidth(width + "%");
-        textArea.setHeight("65%");
-        layoutColumn2.add(textArea);
-
-        saveBtn = new Button("Save");
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, saveBtn);
-        saveBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
-            saveDedication(new Dedication(songCategoryCmbBox.getValue(), songCmbBox.getValue(),textArea.getValue()));
-
-            songCategoryCmbBox.setValue(null);
-            songCmbBox.setValue(null);
-            textArea.clear();
-        });
-        layoutColumn2.add(saveBtn);
     }
 
     private void setupGrid() {
