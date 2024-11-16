@@ -43,3 +43,5 @@ Once the JAR file is built, you can run it using
 - Find add-ons at [vaadin.com/directory](https://vaadin.com/directory).
 - Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join our [Forum](https://vaadin.com/forum).
 - Report issues, create pull requests in [GitHub](https://github.com/vaadin).
+
+![image](https://github.com/Kuba1618/BillApplication/assets/59400834/a62b29c8-f4dc-46c0-bebd-3f520d5822d0)
