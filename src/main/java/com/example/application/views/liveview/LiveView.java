@@ -39,7 +39,7 @@ import java.util.*;
 @RolesAllowed({"USER","ADMIN"})
 public class LiveView extends VerticalLayout {
 
-    public static String liveSongTitle = "";
+    public static String liveSongTitle = "note.png";
 
 //    <a href="https://www.flaticon.com/free-icons/melody" title="melody icons">Melody icons created by msidiqf - Flaticon</a>
 
@@ -61,7 +61,7 @@ public class LiveView extends VerticalLayout {
         imgHeigth = isMobileDevice()? 175 : 97;
 
 
-        Image img = new Image("songs/note.png", "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
+        Image img = new Image("songs/" + liveSongTitle, "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
         img.setWidth(imgWidth - 35 + "%");
         img.setHeight(imgHeigth - 2 + "%");
         add(img);
@@ -90,6 +90,14 @@ public class LiveView extends VerticalLayout {
         setJustifyContentMode(JustifyContentMode.CENTER);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         getStyle().set("text-align", "center");
+    }
+
+    public static String getLiveSongTitle() {
+        return liveSongTitle;
+    }
+
+    public static void setLiveSongTitle(String liveSongTitle) {
+        LiveView.liveSongTitle = liveSongTitle;
     }
 
     private Dialog setSearchPopupDialog(Dialog searchPopup) {

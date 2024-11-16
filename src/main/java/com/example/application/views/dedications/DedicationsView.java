@@ -36,6 +36,7 @@ import java.util.*;
 @RolesAllowed("USER")
 public class DedicationsView extends VerticalLayout {
 
+    public Set<String> categories;
     public VerticalLayout layoutColumn2 = new VerticalLayout();
     private static List<Dedication> listOfDedications = new ArrayList<>();
     private static Grid<Dedication> grid = new Grid<>();
@@ -128,54 +129,6 @@ public class DedicationsView extends VerticalLayout {
         Notification.show(dedication.getTitle() + " shared!");
     }
 
-    public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
-        Set<String> songs = new HashSet<>();
-
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
-        Path libraryPath = Paths.get(resourcesPath, "library.txt");
-
-        try (Scanner scanner = new Scanner(libraryPath)) {
-            while (scanner.hasNextLine()) {
-                // Wczytujemy ID
-                String id = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy tytuł
-                String title = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy autora
-                String author = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy kategorię
-                String category = scanner.nextLine().trim();
-
-                // Wczytujemy tonację lub separator
-                if (scanner.hasNextLine()) {
-                    String tonationOrSeparator = scanner.nextLine().trim();
-                    if (tonationOrSeparator.equals("----------------------")) {
-                        // Jeśli kategoria pasuje, dodaj tytuł do listy
-                        if (category.equals(songCategory)) {
-                            songs.add(title);
-                        }
-                    } else {
-                        // Błąd - oczekiwano separatora, ale znaleziono coś innego
-                        System.err.println("Błąd: Oczekiwano separatora, ale znaleziono: " + tonationOrSeparator);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
-        }
-
-        return songs;
-    }
-
-
-
-
-
     private void refreshGrid() {
         if (listOfDedications.size() > 0) {
             grid.setVisible(true);
@@ -186,36 +139,6 @@ public class DedicationsView extends VerticalLayout {
             hint.setVisible(true);
         }
     }
-
-    private void saveDedication(Dedication dedication) {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
-        Path libraryPath = Paths.get(resourcesPath, "dedications.txt");
-
-        String dedicationDescription = dedication.toString().trim();
-
-        try {
-            if (Files.exists(libraryPath)) {
-
-                List<String> lines = Files.readAllLines(libraryPath);
-
-                if (!lines.isEmpty() && !lines.get(lines.size() - 1).isEmpty()) {
-                    // Jeśli ostatnia linia pliku nie jest pusta, dodaj nową linię przed dedykacją
-                    dedicationDescription = System.lineSeparator() + dedicationDescription;
-                }
-            }
-
-            // Dodanie tekstu na końcu pliku dedications.txtD
-            Files.write(libraryPath, dedicationDescription.getBytes(), StandardOpenOption.APPEND);
-            Notification notification = new Notification("Dedication saved !", NotificationVariant.LUMO_PRIMARY.ordinal());
-
-        } catch (IOException e) {
-            System.err.println("Wystąpił błąd podczas dodawania tekstu do pliku: " + e.getMessage());
-        }
-
-        listOfDedications.add(dedication);
-        this.refreshGrid();
-    }
-
 
     private void removeDedication(Dedication dedication) {
         listOfDedications.remove(dedication);
@@ -266,44 +189,6 @@ public class DedicationsView extends VerticalLayout {
         }
 
         this.refreshGrid();
-    }
-
-    public Set<String> loadSongCategories() {
-        Set<String> categories = new HashSet<>();
-
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
-        Path libraryPath = Paths.get(resourcesPath, "library.txt");
-
-        try (Scanner scanner = new Scanner(libraryPath)) {
-            while (scanner.hasNextLine()) {
-                // Ignorowanie ID
-                String id = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Ignorowanie tytułu
-                String title = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Ignorowanie autora
-                String author = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Pobieranie kategorii
-                String category = scanner.nextLine().trim();
-
-                // Pominięcie separatora
-                if (scanner.hasNextLine()) {
-                    String separator = scanner.nextLine().trim();
-                    if (separator.equals("----------------------")) {
-                        categories.add(category); // Dodaj kategorię do zbioru
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
-        }
-
-        return categories;
     }
 
     public  boolean isMobileDevice() {
