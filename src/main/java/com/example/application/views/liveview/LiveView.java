@@ -1,9 +1,6 @@
 package com.example.application.views.liveview;
 
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -45,6 +42,7 @@ public class LiveView extends VerticalLayout {
 
     public int imgWidth;
     public int imgHeigth;
+    public Image img;
     public Button forteBtn = new Button("Forte",new Icon(VaadinIcon.VOLUME_UP));
     public Button pianoBtn = new Button("Piano",new Icon(VaadinIcon.VOLUME_DOWN));
     public Button fasterBtn = new Button("Faster",new Icon(VaadinIcon.FLIGHT_TAKEOFF));
@@ -61,7 +59,7 @@ public class LiveView extends VerticalLayout {
         imgHeigth = isMobileDevice()? 175 : 97;
 
 
-        Image img = new Image("songs/" + liveSongTitle, "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
+        img = new Image("songs/" + liveSongTitle, "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
         img.setWidth(imgWidth - 35 + "%");
         img.setHeight(imgHeigth - 2 + "%");
         add(img);
@@ -161,10 +159,19 @@ public class LiveView extends VerticalLayout {
         shareBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 //        searchPopup.setAlignSelf(FlexComponent.Alignment.CENTER, shareBtn);
         shareBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
-            int songId = findSongIdByTitleFromFile(songCmbBox.getValue());
-            refreshImage(songId);
-            searchPopup.close();
-            showNotification(songCmbBox.getValue() + " shared !");
+
+            try {
+                String songId = loadSongIdByTitle(songCmbBox.getValue());
+                LiveView.setLiveSongTitle(songId);
+                searchPopup.close();
+                remove(img);
+                add(img);
+                UI.getCurrent().getPage().reload();
+                showNotification(songCmbBox.getValue() + " shared !");
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         verticalLayout.setSpacing(true);
@@ -206,44 +213,41 @@ public class LiveView extends VerticalLayout {
         }
     }
 
-    public Integer findSongIdByTitleFromFile(String titleToFind) {
+    public static String loadSongIdByTitle(String songTitle) throws IOException {
         String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
+        // Wczytujemy wszystkie linie z pliku
+        var lines = Files.readAllLines(libraryPath);
 
-        // Sprawdzanie, czy plik istnieje
-        if (!Files.exists(libraryPath)) {
-            System.err.println("Plik nie został znaleziony: " + libraryPath.toAbsolutePath());
-            return null;
-        }
+        // Iterujemy po liniach, w których każda grupa to 5 linii (ID, Tytuł, Wykonawca, Kategoria, Opis)
+        for (int i = 0; i < lines.size(); i++) {
+            // Pomijamy puste linie i separator
+            String line = lines.get(i).trim();
+            if (line.isEmpty() || line.matches("-+")) {
+                continue;
+            }
 
-        try (Scanner scanner = new Scanner(libraryPath)) {
-            while (scanner.hasNextLine()) {
-                String idLine = scanner.nextLine().trim();        // Odczytaj ID
-                String titleLine = scanner.nextLine().trim();     // Odczytaj tytuł
-                String authorLine = scanner.nextLine().trim();    // Odczytaj autora
-                String categoryLine = scanner.nextLine().trim();  // Odczytaj kategorię
+            // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
+            if (i + 1 < lines.size()) {
+                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
+                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
 
-                // Jeśli plik ma dodatkową linię (tonację) przed separatorem
-                if (scanner.hasNextLine()) {
-                    String potentialTonationOrSeparator = scanner.nextLine().trim();
-                    if (!potentialTonationOrSeparator.equals("----------------------")) {
-                        // Pomiń linie tonacji, jeśli istnieje
-                        if (scanner.hasNextLine()) {
-                            scanner.nextLine(); // Pomiń separator
-                        }
-                    }
-                }
+                // Logowanie: sprawdzamy, co porównujemy
+                //System.out.println("Sprawdzam tytuł: " + title + " z tytułem: " + songTitle);
 
-                // Jeśli tytuł z pliku odpowiada tytułowi szukanemu, zwróć ID
-                if (titleLine.equals(titleToFind)) {
-                    return Integer.parseInt(idLine); // Zwróć ID jako Integer
+                // Sprawdzamy, czy tytuł piosenki pasuje do podanego tytułu
+                if (title.equalsIgnoreCase(songTitle)) {
+                    // Jeśli tytuł pasuje, zwracamy ID (pierwsza linia w grupie)
+                    return id;
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
+
+            // Skaczemy o 4 linie, aby przejść do następnej grupy
+            i += 4;
         }
 
-        // Jeśli nie znaleziono tytułu, zwróć null
+        // Jeśli tytuł nie został znaleziony, zwracamy null
         return null;
     }
 
