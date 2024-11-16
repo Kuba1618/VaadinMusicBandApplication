@@ -1,5 +1,6 @@
 package com.example.application.views.dedications;
 
+import com.example.application.views.liveview.LiveView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -170,7 +171,52 @@ public class AddDedication extends VerticalLayout {
 
     private void shareDedicationSong(Dedication dedication) {
         Notification.show(dedication.getTitle() + " shared!");
+        try {
+            System.out.println(loadSongIdByTitle(dedication.getTitle()));
+            LiveView.setLiveSongTitle(loadSongIdByTitle(dedication.getTitle()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public static String loadSongIdByTitle(String songTitle) throws IOException {
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+        // Wczytujemy wszystkie linie z pliku
+        var lines = Files.readAllLines(libraryPath);
+
+        // Iterujemy po liniach, w których każda grupa to 5 linii (ID, Tytuł, Wykonawca, Kategoria, Opis)
+        for (int i = 0; i < lines.size(); i++) {
+            // Pomijamy puste linie i separator
+            String line = lines.get(i).trim();
+            if (line.isEmpty() || line.matches("-+")) {
+                continue;
+            }
+
+            // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
+            if (i + 1 < lines.size()) {
+                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
+                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
+
+                // Logowanie: sprawdzamy, co porównujemy
+                //System.out.println("Sprawdzam tytuł: " + title + " z tytułem: " + songTitle);
+
+                // Sprawdzamy, czy tytuł piosenki pasuje do podanego tytułu
+                if (title.equalsIgnoreCase(songTitle)) {
+                    // Jeśli tytuł pasuje, zwracamy ID (pierwsza linia w grupie)
+                    return id;
+                }
+            }
+
+            // Skaczemy o 4 linie, aby przejść do następnej grupy
+            i += 4;
+        }
+
+        // Jeśli tytuł nie został znaleziony, zwracamy null
+        return null;
+    }
+
 
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         songs = new HashSet<>();
