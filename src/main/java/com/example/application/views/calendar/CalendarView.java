@@ -24,7 +24,7 @@ import java.util.*;
 @PageTitle("Calendar")
 @Route("calendar")
 @Menu(order = 3, icon = "line-awesome/svg/calendar-solid.svg")
-@RolesAllowed("USER")
+@RolesAllowed({"USER","ADMIN"})
 public class CalendarView extends VerticalLayout {
 
 

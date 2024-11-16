@@ -21,7 +21,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Tuning Fork")
 @Route("tuning-fork")
 @Menu(order = 4, icon = "line-awesome/svg/sliders-h-solid.svg")
-@RolesAllowed("USER")
+@RolesAllowed({"USER","ADMIN"})
 public class TuningFork extends VerticalLayout {
 
     //<a href="https://www.flaticon.com/free-icons/camerton" title="camerton icons">Camerton icons created by Ylivdesign - Flaticon</a>

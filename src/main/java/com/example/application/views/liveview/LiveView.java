@@ -36,7 +36,7 @@ import java.util.*;
 @PageTitle("LiveView")
 @Route("")
 @Menu(order = 0, icon = "line-awesome/svg/globe-solid.svg")
-@RolesAllowed("USER")
+@RolesAllowed({"USER","ADMIN"})
 public class LiveView extends VerticalLayout {
 
     public int imgWidth;

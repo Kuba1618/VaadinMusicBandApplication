@@ -14,7 +14,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Circle Of Fifths")
 @Route("circle-of-fifths")
 @Menu(order = 6, icon = "line-awesome/svg/chart-pie-solid.svg")
-@RolesAllowed("USER")
+@RolesAllowed({"USER","ADMIN"})
 public class CircleOfFifths extends VerticalLayout {
 
     public int imgWidth;

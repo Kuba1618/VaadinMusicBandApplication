@@ -20,7 +20,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Metronome")
 @Route("metronome")
 @Menu(order = 5, icon = "line-awesome/svg/stopwatch-solid.svg")
-@RolesAllowed("USER")
+@RolesAllowed({"USER","ADMIN"})
 public class Metronome extends VerticalLayout {
 
     //<a href="https://www.flaticon.com/free-icons/metronome" title="metronome icons">TuningFork icons created by Freepik - Flaticon</a>
