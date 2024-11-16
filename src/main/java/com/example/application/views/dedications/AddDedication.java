@@ -37,6 +37,7 @@ import java.util.*;
 public class AddDedication extends VerticalLayout {
 
     public Set<String> categories;
+    public Set<String> songs;
     public ComboBox<String> songCategoryCmbBox,songCmbBox;
     public Button saveBtn;
     public TextArea textArea;
@@ -172,52 +173,43 @@ public class AddDedication extends VerticalLayout {
     }
 
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
-        Set<String> songs = new HashSet<>();
+        songs = new HashSet<>();
 
         String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
-        try (Scanner scanner = new Scanner(libraryPath)) {
-            while (scanner.hasNextLine()) {
-                // Wczytujemy ID
-                String id = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy tytuł
-                String title = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy autora
-                String author = scanner.nextLine().trim();
-                if (!scanner.hasNextLine()) break;
-
-                // Wczytujemy kategorię
-                String category = scanner.nextLine().trim();
-
-                // Wczytujemy tonację lub separator
-                if (scanner.hasNextLine()) {
-                    String tonationOrSeparator = scanner.nextLine().trim();
-                    if (tonationOrSeparator.equals("----------------------")) {
-                        // Jeśli kategoria pasuje, dodaj tytuł do listy
-                        if (category.equals(songCategory)) {
-                            songs.add(title);
-                        }
-                    } else {
-                        // Błąd - oczekiwano separatora, ale znaleziono coś innego
-                        System.err.println("Błąd: Oczekiwano separatora, ale znaleziono: " + tonationOrSeparator);
-                    }
-                }
-            }
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(libraryPath);
         } catch (IOException e) {
-            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+
+            // Ignorowanie separatorów
+            if (line.matches("-+")) {
+                continue;
+            }
+
+            // Upewnienie się, że mamy wystarczająco dużo linii na przetworzenie grupy
+            if (i + 3 < lines.size()) {
+                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                String title = lines.get(i+1).trim(); // Pierwsza linia to tytuł
+
+                // Jeśli kategoria pasuje, dodajemy tytuł do zbioru
+                if (category.equalsIgnoreCase(songCategory)) {
+                    songs.add(title);
+                }
+
+                // Skaczemy o 4 linie, aby przejść do następnej grupy
+                i += 4;
+            }
         }
 
         return songs;
     }
-
-
-
-
 
     private void refreshGrid() {
         if (listOfDedications.size() > 0) {
