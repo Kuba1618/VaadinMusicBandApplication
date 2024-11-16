@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -49,7 +50,7 @@ public class AddSongView extends Composite<VerticalLayout> {
     public TextField textField = new TextField();
     public TextField textField2 = new TextField();
     public TextArea textArea = new TextArea();
-    public MultiSelectComboBox<String> multiSelectCmbBox;
+    public ComboBox<String> comboBoxCategory;  // Zmieniamy na ComboBox
     public HorizontalLayout layoutRow = new HorizontalLayout();
     public Icon icon = new Icon();
     public Button saveBtn = new Button();
@@ -58,7 +59,6 @@ public class AddSongView extends Composite<VerticalLayout> {
     public int uploadSongBtnHeight;
 
     public AddSongView() {
-
         txtFieldWidth = isMobileDevice() ? "90%" :"50%";
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -68,6 +68,7 @@ public class AddSongView extends Composite<VerticalLayout> {
         layoutColumn2.getStyle().set("flex-grow", "1");
         layoutColumn2.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         layoutColumn2.setAlignItems(FlexComponent.Alignment.CENTER);
+
         textField.setLabel("Title");
         textField.setWidth(txtFieldWidth);
         textField2.setLabel("Author");
@@ -77,12 +78,14 @@ public class AddSongView extends Composite<VerticalLayout> {
         textArea.setWidth(txtFieldWidth);
         textArea.setHeight("50%");
 
-        multiSelectCmbBox = new MultiSelectComboBox<>("Category");
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, multiSelectCmbBox);
-        multiSelectCmbBox.setWidth(txtFieldWidth);
-        multiSelectCmbBox.setHeight("50%");
-        setMultiSelectCmbBox(multiSelectCmbBox);
-        layoutColumn2.add(multiSelectCmbBox);
+        // Tworzymy ComboBox zamiast MultiSelectComboBox
+        comboBoxCategory = new ComboBox<>("Category");
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, comboBoxCategory);
+        comboBoxCategory.setWidth(txtFieldWidth);
+        comboBoxCategory.setHeight("50%");
+        comboBoxCategory.setItems(loadSongCategories());
+
+        layoutColumn2.add(comboBoxCategory);
 
         layoutRow.setWidthFull();
         layoutColumn2.setFlexGrow(1.0, layoutRow);
@@ -105,7 +108,7 @@ public class AddSongView extends Composite<VerticalLayout> {
         layoutColumn2.add(textField);
         layoutColumn2.add(textField2);
         layoutColumn2.add(textArea);
-        layoutColumn2.add(multiSelectCmbBox);
+        layoutColumn2.add(comboBoxCategory);  // Dodajemy ComboBox do layoutu
         layoutColumn2.add(layoutRow);
         layoutRow.add(uploadSongFile);
         layoutRow.setSpacing(true);
@@ -115,7 +118,7 @@ public class AddSongView extends Composite<VerticalLayout> {
         saveSong();
     }
 
-    public void setMultiSelectCmbBox(MultiSelectComboBox<String> multiSelectCmbBox){
+    public List<String>  loadSongCategories(){
         List<String> listOfCategories = new ArrayList<>();
         listOfCategories.add("Disco Polo");
         listOfCategories.add("Rock");
@@ -124,7 +127,7 @@ public class AddSongView extends Composite<VerticalLayout> {
         listOfCategories.add("Wedding cake");
         listOfCategories.add("90's hit");
         listOfCategories.add("For parents");
-        multiSelectCmbBox.setItems(listOfCategories);
+        return listOfCategories;
     } //fill song categories cmbBox
 
     public void displayDeviceCategory(){
@@ -142,7 +145,8 @@ public class AddSongView extends Composite<VerticalLayout> {
 
     public void saveSong() {
         saveBtn.addClickListener(buttonClickEvent -> {
-            Song song = new Song(textField.getValue(), textField2.getValue(), String.valueOf(multiSelectCmbBox.getValue()), textArea.getValue(), file);
+
+            Song song = new Song(textField.getValue(), textField2.getValue(), comboBoxCategory.getValue(), textArea.getValue(), file);
             File songFile = song.getSongFile();
             String extension = "";
 
