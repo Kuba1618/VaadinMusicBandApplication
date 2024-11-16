@@ -1,4 +1,4 @@
-package com.example.application.views.addsong;
+package com.example.application.views.songs;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;

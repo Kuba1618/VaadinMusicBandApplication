@@ -39,6 +39,10 @@ import java.util.*;
 @RolesAllowed({"USER","ADMIN"})
 public class LiveView extends VerticalLayout {
 
+    public static String liveSongTitle = "";
+
+//    <a href="https://www.flaticon.com/free-icons/melody" title="melody icons">Melody icons created by msidiqf - Flaticon</a>
+
     public int imgWidth;
     public int imgHeigth;
     public Button forteBtn = new Button("Forte",new Icon(VaadinIcon.VOLUME_UP));
@@ -56,7 +60,8 @@ public class LiveView extends VerticalLayout {
         imgWidth = isMobileDevice()? 120 : 65;
         imgHeigth = isMobileDevice()? 175 : 97;
 
-        Image img = new Image("songs/134342601.jpg", "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
+
+        Image img = new Image("songs/note.png", "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
         img.setWidth(imgWidth - 35 + "%");
         img.setHeight(imgHeigth - 2 + "%");
         add(img);

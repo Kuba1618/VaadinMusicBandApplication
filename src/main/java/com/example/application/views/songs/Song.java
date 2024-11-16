@@ -1,4 +1,4 @@
-package com.example.application.views.addsong;
+package com.example.application.views.songs;
 
 import java.io.File;
 import java.util.Random;
