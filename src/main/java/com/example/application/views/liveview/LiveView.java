@@ -257,31 +257,29 @@ public class LiveView extends VerticalLayout {
         String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
-        // Sprawdzanie, czy plik istnieje
-        if (!Files.exists(libraryPath)) {
-            System.err.println("Plik nie został znaleziony: " + libraryPath.toAbsolutePath());
-            return categories;
-        }
-        try (Scanner scanner = new Scanner(libraryPath)) {
-            while (scanner.hasNextLine()) {
-                String category = scanner.nextLine().trim();     // Pobieramy kategorię
-                // Sprawdzanie, czy istnieje dodatkowa linia (tonacja) przed separatorem
-                if (scanner.hasNextLine()) {
-                    String potentialTonationOrSeparator = scanner.nextLine().trim();
-                    if (!potentialTonationOrSeparator.equals("----------------------")) {
-                        // Jeśli to nie separator, oznacza to, że linia zawiera tonację, którą ignorujemy
-                        // Wczytujemy separator po tonacji
-                        if (scanner.hasNextLine()) {
-                            scanner.nextLine(); // Przejście przez separator
-                        }
-                    }
-                }
-                if (!category.isEmpty()) {
-                    categories.add(category);
-                }
-            }
+        // Wczytywanie wszystkich linii z pliku
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(libraryPath);
         } catch (IOException e) {
-            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        // Iteracja po liniach, rozdzielając dane w grupach
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+
+            // Pomijanie separatorów (linia składająca się z myślników)
+            if (line.matches("-+")) {
+                continue;
+            }
+
+            // Sprawdzamy, czy mamy przynajmniej 4 linie danych w grupie (ID, Tytuł, Wykonawca, Kategoria, Opis)
+            if (i + 3 < lines.size()) {
+                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                categories.add(category);
+                i += 4; // Przechodzimy do następnej grupy (5 linia)
+            }
         }
 
         return categories;
