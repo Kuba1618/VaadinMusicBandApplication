@@ -46,3 +46,4 @@ Once the JAR file is built, you can run it using
 
 ![image](https://github.com/Kuba1618/VaadinMusicBandApplication/blob/master/desktopVersion/addSong.png)
 ![image](https://github.com/Kuba1618/VaadinMusicBandApplication/blob/master/desktopVersion/authenticated_user.png)
+![image](https://github.com/Kuba1618/VaadinMusicBandApplication/blob/master/desktopVersion/calendar.png)
