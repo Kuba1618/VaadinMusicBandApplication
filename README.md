@@ -45,3 +45,4 @@ Once the JAR file is built, you can run it using
 - Report issues, create pull requests in [GitHub](https://github.com/vaadin).
 
 ![image](https://github.com/Kuba1618/VaadinMusicBandApplication/blob/master/desktopVersion/addSong.png)
+![image](https://github.com/Kuba1618/VaadinMusicBandApplication/blob/master/desktopVersion/authenticated_user.png)
