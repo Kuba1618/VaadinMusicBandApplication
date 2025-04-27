@@ -2,7 +2,7 @@
 
 // 🔒 Podaj dane swojej sieci WiFi:
 const char* ssid = "POCO C65";
-const char* password = "***************";
+const char* password = "razdwatrzy";
 
 const int redPin = 14;
 const int greenPin = 13;

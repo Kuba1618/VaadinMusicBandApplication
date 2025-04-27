@@ -1,70 +1,52 @@
 package com.example.application.lights;
 
-import com.vaadin.flow.component.charts.model.style.Color;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.vaadin.addons.tatu.ColorPicker;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @PageTitle("LightsView")
 @Route("lights")
 @Menu(order = 3, icon = "line-awesome/svg/lightbulb.svg")
-@RolesAllowed("ADMIN")
-
-
+@RolesAllowed({"USER", "ADMIN"})
 public class LightsView extends VerticalLayout {
 
+    // IP Twojego ESP32
+    private final String esp32Ip = "192.168.45.33";
+
     public LightsView() {
-        // Picker kolorów
-        ColorPicker colorPicker = new ColorPicker();
-        colorPicker.setLabel("Color");
-        colorPicker.setPresets(Arrays.asList(
-                new ColorPicker.ColorPreset("#00ff00", "Color 1"),
-                new ColorPicker.ColorPreset("#ff0000", "Color 2")
-        ));
+        setAlignItems(Alignment.CENTER);
 
-        // Pole z kodem HEX
-        TextField hexField = new TextField("Selected HEX");
-        hexField.setReadOnly(true);
+        Button redButton = new Button("🔴 Czerwony", e -> sendColorCommand("/red"));
+        Button greenButton = new Button("🟢 Zielony", e -> sendColorCommand("/green"));
+        Button blueButton = new Button("🔵 Niebieski", e -> sendColorCommand("/blue"));
+        Button whiteButton = new Button("⚪ Biały", e -> sendColorCommand("/white"));
+        Button offButton = new Button("⚫ Zgaś", e -> sendColorCommand("/off"));
 
-        // Pole z wartością RGB
-        TextField rgbField = new TextField("Selected RGB");
-        rgbField.setReadOnly(true);
+        add(redButton, greenButton, blueButton, whiteButton, offButton);
+    }
 
-        // Podgląd koloru
-        Div colorPreview = new Div();
-        colorPreview.setWidth("100px");
-        colorPreview.setHeight("30px");
-        colorPreview.getStyle().set("border", "1px solid #ccc");
-
-        // Listener zmiany koloru
-        colorPicker.addValueChangeListener(event -> {
-            String hex = event.getValue(); // np. "#ff0000"
-
-            hexField.setValue(hex.toUpperCase());
-
-            // Konwersja HEX -> RGB
-            int r = Integer.parseInt(hex.substring(1, 3), 16);
-            int g = Integer.parseInt(hex.substring(3, 5), 16);
-            int b = Integer.parseInt(hex.substring(5, 7), 16);
-
-            String rgb = "rgb(" + r + ", " + g + ", " + b + ")";
-            rgbField.setValue(rgb);
-
-            // Podgląd
-            colorPreview.getStyle().set("background-color", hex);
-
-            Notification.show("Wybrano kolor: " + hex + " / " + rgb);
-        });
-
-        // Dodajemy do layoutu
-        add(colorPicker, hexField, rgbField, colorPreview);
+    private void sendColorCommand(String colorPath) {
+        try {
+            URL url = new URL("http://" + esp32Ip + colorPath);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                Notification.show("Kolor zmieniony: " + colorPath);
+            } else {
+                Notification.show("Błąd zmiany koloru. Kod: " + responseCode);
+            }
+        } catch (IOException e) {
+            Notification.show("Nie można połączyć się z ESP32: " + e.getMessage());
+        }
     }
 }
