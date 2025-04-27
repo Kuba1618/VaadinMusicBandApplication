@@ -16,7 +16,7 @@ import java.util.Arrays;
 @PageTitle("LightsView")
 @Route("lights")
 @Menu(order = 3, icon = "line-awesome/svg/lightbulb.svg")
-@RolesAllowed("ADMIN") 
+@RolesAllowed("ADMIN")
 
 
 public class LightsView extends VerticalLayout {
