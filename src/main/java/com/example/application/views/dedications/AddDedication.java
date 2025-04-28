@@ -275,16 +275,6 @@ public class AddDedication extends VerticalLayout {
         String dedicationDescription = dedication.toString().trim();
 
         try {
-            if (Files.exists(libraryPath)) {
-
-                List<String> lines = Files.readAllLines(libraryPath);
-
-                if (!lines.isEmpty() && !lines.get(lines.size() - 1).isEmpty()) {
-                    // Jeśli ostatnia linia pliku nie jest pusta, dodaj nową linię przed dedykacją
-                    dedicationDescription = System.lineSeparator() + dedicationDescription;
-                }
-            }
-
             // Dodanie tekstu na końcu pliku dedications.txtD
             Files.write(libraryPath, dedicationDescription.getBytes(), StandardOpenOption.APPEND);
             Notification notification = new Notification("Dedication saved !", NotificationVariant.LUMO_PRIMARY.ordinal());
@@ -322,8 +312,8 @@ public class AddDedication extends VerticalLayout {
 
                 // Sprawdź, czy linia nie jest separatorem
                 if (!line.equals("----------------------") && i + 2 < lines.size()) {
-                    String title = lines.get(i).trim();
-                    String category = lines.get(i + 1).trim();
+                    String category = lines.get(i).trim();
+                    String title = lines.get(i + 1).trim();
                     String description = lines.get(i + 2).trim();
 
                     // Porównaj tytuł, kategorię i opis z usuwaną dedykacją (ignorując białe znaki)
