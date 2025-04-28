@@ -1,4 +1,4 @@
-**!!! To run it also on a different devices you should run ngrok.exe and enter "ngrok http 8080". !!!**
+**!!! To run it also on a different devices you should run ngrok.exe and enter "ngrok http 8080" !!!**
 
 # MusicBandApp
 
