@@ -81,7 +81,7 @@ public class SongView extends VerticalLayout {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_TERTIARY,
                             ButtonVariant.LUMO_TERTIARY);
-                    //button.addClickListener(e -> this.shareSong(song)); //@ToDo TUTAJ wrócić i dokończyć
+                    button.addClickListener(e -> this.shareSong(song)); //@ToDo TUTAJ wrócić i dokończyć
                     button.setIcon(new Icon(VaadinIcon.SHARE));
                 })).setHeader("Share").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(
@@ -128,11 +128,11 @@ public class SongView extends VerticalLayout {
         return songs;
     }
 
-    private void shareDedicationSong(Dedication dedication) {
-        Notification.show(dedication.getTitle() + " shared!");
+    private void shareSong(Song song) {
+        Notification.show(song.getTitle() + " shared!");
         try {
-            System.out.println(loadSongIdByTitle(dedication.getTitle()));
-            LiveView.setLiveSongTitle(loadSongIdByTitle(dedication.getTitle()));
+            //System.out.println(loadSongIdByTitle(song.getTitle()));
+            LiveView.setLiveSongTitle(loadSongIdByTitle(song.getTitle()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
