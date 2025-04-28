@@ -5,10 +5,10 @@ import java.util.Random;
 
 public class Song {
 
-    public int id;
+    public String id;
     public String title;
     public String author;
-    public String categories;
+    public String category;
     public String description;
     public File songFile;
 
@@ -16,12 +16,20 @@ public class Song {
     public Song() {
     }
 
-    public Song(String title, String author, String categories, String description, File songFile) {
-        Random generator = new Random();
-        this.id = 100000000 + generator.nextInt(900000000);
+    public Song(String id,String title, String author, String category, String description) {
+        this.id = id;
         this.title = title;
         this.author = author;
-        this.categories = categories;
+        this.category = category;
+        this.description = description;
+    }
+
+    public Song(String title, String author, String category, String description, File songFile) {
+        Random generator = new Random();
+        this.id = 100000000 + generator.nextInt(900000000) + "";
+        this.title = title;
+        this.author = author;
+        this.category = category;
         this.description = description;
         this.songFile = songFile;
     }
@@ -35,11 +43,11 @@ public class Song {
     }
 
     public String getCategory() {
-        return categories;
+        return category;
     }
 
     public void setCategory(String categories) {
-        this.categories = categories;
+        this.category = categories;
     }
 
     public String getDescription() {
@@ -58,11 +66,11 @@ public class Song {
         this.author = author;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -72,6 +80,16 @@ public class Song {
 
     public void setSongFile(File songFile) {
         this.songFile = songFile;
+    }
+
+    @Override
+    public String toString() {
+        return  id + "\n" +
+                title + "\n" +
+                author + "\n" +
+                category + "\n" +
+                description + "\n" +
+                "----------------------\n" ;
     }
 
 }
