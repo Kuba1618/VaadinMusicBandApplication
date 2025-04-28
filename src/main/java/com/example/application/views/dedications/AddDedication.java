@@ -172,7 +172,8 @@ public class AddDedication extends VerticalLayout {
     private void shareDedicationSong(Dedication dedication) {
         try {
             LiveView.setLiveSongTitle(loadSongIdByTitle(dedication.getTitle()));
-            Notification.show(dedication.getTitle() + " shared!");
+            Notification notification = Notification.show(dedication.getTitle() + " shared!");
+            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
