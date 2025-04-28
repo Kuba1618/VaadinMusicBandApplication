@@ -170,10 +170,9 @@ public class AddDedication extends VerticalLayout {
     }
 
     private void shareDedicationSong(Dedication dedication) {
-        Notification.show(dedication.getTitle() + " shared!");
         try {
-            System.out.println(loadSongIdByTitle(dedication.getTitle()));
             LiveView.setLiveSongTitle(loadSongIdByTitle(dedication.getTitle()));
+            Notification.show(dedication.getTitle() + " shared!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -268,6 +267,28 @@ public class AddDedication extends VerticalLayout {
         }
     }
 
+    private void saveAllDedications() {
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        Path libraryPath = Paths.get(resourcesPath, "dedications.txt");
+
+        StringBuilder allDedicationsBuilder = new StringBuilder();
+
+        for (Dedication dedication : listOfDedications) {
+            allDedicationsBuilder.append(dedication.getTitle()).append(System.lineSeparator());
+            allDedicationsBuilder.append(dedication.getCategory()).append(System.lineSeparator());
+            allDedicationsBuilder.append(dedication.getDescription()).append(System.lineSeparator());
+            allDedicationsBuilder.append("----------------------").append(System.lineSeparator());
+        }
+
+        try {
+            Files.write(libraryPath, allDedicationsBuilder.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Błąd podczas zapisywania dedykacji: " + e.getMessage());
+        }
+    }
+
+
+
     private void saveDedication(Dedication dedication) {
         String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
         Path libraryPath = Paths.get(resourcesPath, "dedications.txt");
@@ -290,53 +311,54 @@ public class AddDedication extends VerticalLayout {
 
     private void removeDedication(Dedication dedication) {
         listOfDedications.remove(dedication);
-
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
-        Path dedicationsPath = Paths.get(resourcesPath, "dedications.txt");
-
-        try {
-            // Wczytanie wszystkich linii z pliku
-            List<String> lines = Files.readAllLines(dedicationsPath);
-            List<String> updatedLines = new ArrayList<>();
-            boolean skipNextLines = false;
-
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i).trim();
-
-                if (skipNextLines) {
-                    // Pomiń kolejne 4 linie (tytuł, kategoria, opis, separator)
-                    i += 3; // Pomiń 3 linie, a separator zostanie pominięty automatycznie w następnym obrocie
-                    skipNextLines = false;
-                    continue;
-                }
-
-                // Sprawdź, czy linia nie jest separatorem
-                if (!line.equals("----------------------") && i + 2 < lines.size()) {
-                    String category = lines.get(i).trim();
-                    String title = lines.get(i + 1).trim();
-                    String description = lines.get(i + 2).trim();
-
-                    // Porównaj tytuł, kategorię i opis z usuwaną dedykacją (ignorując białe znaki)
-                    if (title.equalsIgnoreCase(dedication.getTitle().trim()) &&
-                            category.equalsIgnoreCase(dedication.getCategory().trim()) &&
-                            description.equalsIgnoreCase(dedication.getDescription().trim())) {
-                        skipNextLines = true; // Ustaw flagę na pominięcie następnych linii
-                        continue; // Pomiń dodawanie tej dedykacji i separatora
-                    }
-                }
-
-                // Dodaj bieżącą linię do zaktualizowanej listy
-                updatedLines.add(line);
-            }
-
-            // Zapisz zaktualizowane linie do pliku
-            Files.write(dedicationsPath, updatedLines);
-
-        } catch (IOException e) {
-            System.err.println("Błąd podczas aktualizacji pliku: " + e.getMessage());
-        }
-
-        this.refreshGrid();
+        refreshGrid();
+        saveAllDedications(); // <-- nadpisuje cały plik nową wersją
+//        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+//        Path dedicationsPath = Paths.get(resourcesPath, "dedications.txt");
+//
+//        try {
+//            // Wczytanie wszystkich linii z pliku
+//            List<String> lines = Files.readAllLines(dedicationsPath);
+//            List<String> updatedLines = new ArrayList<>();
+//            boolean skipNextLines = false;
+//
+//            for (int i = 0; i < lines.size(); i++) {
+//                String line = lines.get(i).trim();
+//
+//                if (skipNextLines) {
+//                    // Pomiń kolejne 4 linie (tytuł, kategoria, opis, separator)
+//                    i += 3; // Pomiń 3 linie, a separator zostanie pominięty automatycznie w następnym obrocie
+//                    skipNextLines = false;
+//                    continue;
+//                }
+//
+//                // Sprawdź, czy linia nie jest separatorem
+//                if (!line.equals("----------------------") && i + 2 < lines.size()) {
+//                    String title = lines.get(i).trim();
+//                    String category = lines.get(i + 1).trim();
+//                    String description = lines.get(i + 2).trim();
+//
+//                    // Porównaj tytuł, kategorię i opis z usuwaną dedykacją (ignorując białe znaki)
+//                    if (title.equalsIgnoreCase(dedication.getTitle().trim()) &&
+//                            category.equalsIgnoreCase(dedication.getCategory().trim()) &&
+//                            description.equalsIgnoreCase(dedication.getDescription().trim())) {
+//                        skipNextLines = true; // Ustaw flagę na pominięcie następnych linii
+//                        continue; // Pomiń dodawanie tej dedykacji i separatora
+//                    }
+//                }
+//
+//                // Dodaj bieżącą linię do zaktualizowanej listy
+//                updatedLines.add(line);
+//            }
+//
+//            // Zapisz zaktualizowane linie do pliku
+//            Files.write(dedicationsPath, updatedLines);
+//
+//        } catch (IOException e) {
+//            System.err.println("Błąd podczas aktualizacji pliku: " + e.getMessage());
+//        }
+//
+//        this.refreshGrid();
     }
 
     public Set<String> loadSongCategories() {
