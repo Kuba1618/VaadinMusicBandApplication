@@ -145,7 +145,15 @@ public class AddSongView extends Composite<VerticalLayout> {
 
     public void saveSong() {
         saveBtn.addClickListener(buttonClickEvent -> {
-
+            try {
+                if ((textField.getValue().length() <= 0) || (textField2.getValue().length() <= 0) || (comboBoxCategory.getValue().length() <= 0) || (textArea.getValue().length() <= 0) || (file.exists() == false)) {
+                    Notification notification = Notification.show("Uzupełnij wszystkie pola !" );
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    return;
+                }
+            }catch (Exception e)
+            {
+            }
             Song song = new Song(textField.getValue(), textField2.getValue(), comboBoxCategory.getValue(), textArea.getValue(), file);
             File songFile = song.getSongFile();
             String extension = "";
@@ -158,7 +166,6 @@ public class AddSongView extends Composite<VerticalLayout> {
             String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
             File newSongFile = new File(resourcesPath, song.getId() + "." + extension);
             songFile.renameTo(newSongFile);
-
             Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
             String songMetaData = song.getId() + "\n" +
