@@ -1,228 +1,355 @@
 package com.example.application.views.songs;
-
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.Text;
+import com.example.application.views.liveview.LiveView;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 @PageTitle("Add Song")
 @Route("add-song")
-@Menu(order = 2, icon = "line-awesome/svg/music-solid.svg")
+@Menu(order = 1, icon = "line-awesome/svg/music-solid.svg")
 @RolesAllowed("ADMIN")
-public class AddSongView extends Composite<VerticalLayout> {
+public class AddSongView extends VerticalLayout {
 
-    private File file;
-    private String originalFileName;
-    private String mimeType;
-    Upload uploadSongFile = new Upload(this::receiveUpload);
+    public Set<String> categories;
+    public Set<String> songs;
+    public ComboBox<String> songCategoryCmbBox,songCmbBox;
+    public Button saveBtn;
+    public TextArea textArea;
     public VerticalLayout layoutColumn2 = new VerticalLayout();
-    public TextField textField = new TextField();
-    public TextField textField2 = new TextField();
-    public TextArea textArea = new TextArea();
-    public ComboBox<String> comboBoxCategory;  // Zmieniamy na ComboBox
-    public HorizontalLayout layoutRow = new HorizontalLayout();
-    public Icon icon = new Icon();
-    public Button saveBtn = new Button();
-    public String txtFieldWidth;
-    public int uploadSongBtnWidth;
-    public int uploadSongBtnHeight;
+    private static List<Song> listOfSongs = new ArrayList<>();
+    private static Grid<Song> grid = new Grid<>();
+    private static Div hint = new Div();
+    public int width;
+    public int height;
 
-    public AddSongView() {
-        txtFieldWidth = isMobileDevice() ? "90%" :"50%";
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
+    public AddSongView(){
+
+        width = isMobileDevice() ? 98 : 80;
+
         layoutColumn2.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
         layoutColumn2.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         layoutColumn2.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        textField.setLabel("Title");
-        textField.setWidth(txtFieldWidth);
-        textField2.setLabel("Author");
-        textField2.setWidth(txtFieldWidth);
-        textArea.setLabel("Description");
+        createDynamicGrid();
+
+        add(layoutColumn2);
+    }
+    public void createDynamicGrid(){
+        this.setupGrid();
+        this.createAddSongForm();
+        this.refreshGrid();
+    }
+    public void createAddSongForm(){
+        songCategoryCmbBox = new ComboBox<>("Song Category");
+        songCategoryCmbBox.setWidth(width + "%");
+        songCategoryCmbBox.setHeight("15%");
+        songCategoryCmbBox.setItems(loadSongCategories());
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, songCategoryCmbBox);
+        layoutColumn2.add(songCategoryCmbBox);
+
+        songCategoryCmbBox.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ComboBox<String>, String>>) event -> {
+            Set<String> songsToCmbBox = loadSongTitlesBasedOnCategorie(songCategoryCmbBox.getValue());
+            songCmbBox.setItems(songsToCmbBox);
+        });
+
+        songCmbBox = new ComboBox<>("Song Title");
+        songCmbBox.setWidth(width + "%");
+        songCmbBox.setHeight("15%");
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, songCmbBox);
+        layoutColumn2.add(songCmbBox);
+
+        songCmbBox.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ComboBox<String>, String>>) comboBoxStringComponentValueChangeEvent -> System.out.println(songCmbBox.getValue()));
+
+        textArea = new TextArea("Description");
         layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, textArea);
-        textArea.setWidth(txtFieldWidth);
-        textArea.setHeight("50%");
-
-        // Tworzymy ComboBox zamiast MultiSelectComboBox
-        comboBoxCategory = new ComboBox<>("Category");
-        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, comboBoxCategory);
-        comboBoxCategory.setWidth(txtFieldWidth);
-        comboBoxCategory.setHeight("50%");
-        comboBoxCategory.setItems(loadSongCategories());
-
-        layoutColumn2.add(comboBoxCategory);
-
-        layoutRow.setWidthFull();
-        layoutColumn2.setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(LumoUtility.Gap.MEDIUM);
-        layoutRow.setWidth(txtFieldWidth);
-        layoutRow.getStyle().set("flex-grow", "1");
-        layoutRow.setAlignItems(FlexComponent.Alignment.CENTER);
-        layoutRow.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-
-        uploadSongBtnWidth = isMobileDevice() ? 85 : 80;
-        uploadSongBtnHeight = isMobileDevice() ? 30 : 25;
-        uploadSongFile.setWidth(uploadSongBtnWidth + "%");
-        uploadSongFile.setHeight(uploadSongBtnHeight + "%");
-
-        saveBtn.setText("Save");
-        saveBtn.setWidth("7%");
-        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        getContent().add(layoutColumn2);
-        layoutColumn2.add(textField);
-        layoutColumn2.add(textField2);
+        textArea.setWidth(width + "%");
+        textArea.setHeight("65%");
         layoutColumn2.add(textArea);
-        layoutColumn2.add(comboBoxCategory);  // Dodajemy ComboBox do layoutu
-        layoutColumn2.add(layoutRow);
-        layoutRow.add(uploadSongFile);
-        layoutRow.setSpacing(true);
-        layoutRow.add(saveBtn);
 
-        displayDeviceCategory();
-        saveSong();
-    }
+        saveBtn = new Button("Save");
+        saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, saveBtn);
+        saveBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
+            saveSong(new Song(songCategoryCmbBox.getValue(), songCmbBox.getValue(),textArea.getValue()));
 
-    public List<String>  loadSongCategories(){
-        List<String> listOfCategories = new ArrayList<>();
-        listOfCategories.add("Disco Polo");
-        listOfCategories.add("Rock");
-        listOfCategories.add("First dance");
-        listOfCategories.add("Electronic");
-        listOfCategories.add("Wedding cake");
-        listOfCategories.add("90's hit");
-        listOfCategories.add("For parents");
-        return listOfCategories;
-    } //fill song categories cmbBox
-
-    public void displayDeviceCategory(){
-        uploadSongFile.setAcceptedFileTypes("image/jpeg", "image/jpg", "image/png", "image/gif");
-        uploadSongFile.addSucceededListener(event -> {
-            layoutColumn2.add(new Image(new StreamResource(this.originalFileName,this::loadFile),"Uploaded image"));
+            songCategoryCmbBox.setValue(null);
+            songCmbBox.setValue(null);
+            textArea.clear();
         });
-
-        uploadSongFile.addFailedListener(event -> {
-            Div output = new Div(new Text("(no image file uploaded yet)"));
-            output.removeAll();
-            output.add(new Text("Upload failed: " + event.getReason()));
-        });
+        layoutColumn2.add(saveBtn);
     }
 
-    public void saveSong() {
-        saveBtn.addClickListener(buttonClickEvent -> {
-            try {
-                if ((textField.getValue().length() <= 0) || (textField2.getValue().length() <= 0) || (comboBoxCategory.getValue().length() <= 0) || (textArea.getValue().length() <= 0) || (file.exists() == false)) {
-                    Notification notification = Notification.show("Uzupełnij wszystkie pola !" );
-                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    return;
-                }
-            }catch (Exception e)
-            {
-            }
-            Song song = new Song(textField.getValue(), textField2.getValue(), comboBoxCategory.getValue(), textArea.getValue(), file);
-            File songFile = song.getSongFile();
-            String extension = "";
+    private void setupGrid() {
 
-            int i = originalFileName.lastIndexOf('.');
-            if (i > 0) {
-                extension = originalFileName.substring(i + 1);
-            }
+        grid = new Grid<>(Song.class, false);
+        grid.setWidth("100%");
+        grid.setAllRowsVisible(true);
+        //grid.addColumn(Dedication::getCategory).setHeader("Category").setAutoWidth(true);
+        grid.addColumn(song -> String.join(", ", song.getCategory()))
+                .setHeader("Category")
+                .setAutoWidth(true)
+                .setFlexGrow(1);
+        grid.addColumn(Song::getTitle).setHeader("Title").setAutoWidth(true).setFlexGrow(1);
+        grid.addColumn(Song::getDescription).setHeader("Description").setAutoWidth(true).setFlexGrow(9);
+        grid.addColumn(
+                new ComponentRenderer<>(Button::new, (button, song) -> {
+                    button.addThemeVariants(ButtonVariant.LUMO_ICON,
+                            ButtonVariant.LUMO_TERTIARY,
+                            ButtonVariant.LUMO_TERTIARY);
+                    button.addClickListener(e -> this.shareSong(song));
+                    button.setIcon(new Icon(VaadinIcon.SHARE));
+                })).setHeader("Share").setAutoWidth(true).setFlexGrow(0);
+        grid.addColumn(
+                new ComponentRenderer<>(Button::new, (button, song) -> {
+                    button.addThemeVariants(ButtonVariant.LUMO_ICON,
+                            ButtonVariant.LUMO_ERROR,
+                            ButtonVariant.LUMO_TERTIARY);
+                    button.addClickListener(e -> this.removeSong(song));
+                    button.setIcon(new Icon(VaadinIcon.TRASH));
+                })).setHeader("Delete").setAutoWidth(true).setFlexGrow(0);
 
-            String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
-            File newSongFile = new File(resourcesPath, song.getId() + "." + extension);
-            songFile.renameTo(newSongFile);
-            Path libraryPath = Paths.get(resourcesPath, "library.txt");
-
-            String songMetaData = song.getId() + "\n" +
-                    song.getTitle() + "\n" +
-                    song.getAuthor() + "\n" +
-                    song.getCategory() + "\n" +
-                    song.getDescription() + "\n----------------------\n";
-
-            try {
-                Files.write(libraryPath, songMetaData.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-                showNotification("Song added successfully!");
-            } catch (IOException e) {
-                showNotification("An error occurred while adding the song: " + e.getMessage());
-            }
-        });
+        listOfSongs = loadDataFromFile();
+        grid.setItems(listOfSongs);
+        grid.setWidth(width + "%");
+        layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, grid);
+        layoutColumn2.add(grid);
     }
 
+    private List<Song> loadDataFromFile() {
+        List<Song> songs = new ArrayList<>();
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path songsPath = Paths.get(resourcesPath, "library.txt");
 
-
-    public void showNotification(String notificationMessage){
-        Notification notification = Notification.show(notificationMessage);
-        if(isMobileDevice()){
-            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-        }
-        else if(!isMobileDevice()){
-            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-        }
-    }
-
-    public InputStream loadFile() {
         try {
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath(), e);
-        }
-        return null;
-    }
+            // Wczytanie wszystkich linii z pliku
+            List<String> lines = Files.readAllLines(songsPath);
 
-    public OutputStream receiveUpload(String originalFileName, String MIMEType) {
-        this.originalFileName = originalFileName;
-        this.mimeType = MIMEType;
-        try {
-            // Create a temporary file for example, you can provide your file here.
-            this.file = File.createTempFile("prefix-", "-suffix");
-            file.deleteOnExit();
-            return new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath(), e);
+            // Przechodzenie przez linie i tworzenie dedykacji
+            for (int i = 0; i < lines.size(); i += 4) {
+                String title = lines.get(i).trim(); // Pierwsza linia to tytuł
+                String category = lines.get(i + 1).trim(); // Druga linia to kategoria
+                String description = lines.get(i + 2).trim(); // Trzecia linia to opis
+
+                // Tworzenie obiektu Dedication i dodanie go do listy
+                Song song = new Song(title,category, description);
+                songs.add(song);
+            }
         } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath() + "'", e);
+            System.err.println("Błąd podczas odczytu pliku: " + e.getMessage());
         }
+
+        return songs;
+    }
+
+    private void shareSong(Song song) {
+        try {
+            LiveView.setLiveSongTitle(loadSongIdByTitle(song.getTitle()));
+            Notification notification = Notification.show(song.getTitle() + " shared!");
+            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String loadSongIdByTitle(String songTitle) throws IOException {
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+        // Wczytujemy wszystkie linie z pliku
+        var lines = Files.readAllLines(libraryPath);
+
+        // Iterujemy po liniach, w których każda grupa to 5 linii (ID, Tytuł, Wykonawca, Kategoria, Opis)
+        for (int i = 0; i < lines.size(); i++) {
+            // Pomijamy puste linie i separator
+            String line = lines.get(i).trim();
+            if (line.isEmpty() || line.matches("-+")) {
+                continue;
+            }
+
+            // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
+            if (i + 1 < lines.size()) {
+                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
+                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
+
+                // Logowanie: sprawdzamy, co porównujemy
+                //System.out.println("Sprawdzam tytuł: " + title + " z tytułem: " + songTitle);
+
+                // Sprawdzamy, czy tytuł piosenki pasuje do podanego tytułu
+                if (title.equalsIgnoreCase(songTitle)) {
+                    // Jeśli tytuł pasuje, zwracamy ID (pierwsza linia w grupie)
+                    return id;
+                }
+            }
+
+            // Skaczemy o 4 linie, aby przejść do następnej grupy
+            i += 4;
+        }
+
+        // Jeśli tytuł nie został znaleziony, zwracamy null
         return null;
+    }
+
+
+    public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
+        songs = new HashSet<>();
+
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(libraryPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+
+            // Ignorowanie separatorów
+            if (line.matches("-+")) {
+                continue;
+            }
+
+            // Upewnienie się, że mamy wystarczająco dużo linii na przetworzenie grupy
+            if (i + 3 < lines.size()) {
+                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                String title = lines.get(i+1).trim(); // Pierwsza linia to tytuł
+
+                // Jeśli kategoria pasuje, dodajemy tytuł do zbioru
+                if (category.equalsIgnoreCase(songCategory)) {
+                    songs.add(title);
+                }
+
+                // Skaczemy o 4 linie, aby przejść do następnej grupy
+                i += 4;
+            }
+        }
+
+        return songs;
+    }
+
+    private void refreshGrid() {
+        if (listOfSongs.size() > 0) {
+            grid.setVisible(true);
+            hint.setVisible(false);
+            grid.getDataProvider().refreshAll();
+        } else {
+            grid.setVisible(false);
+            hint.setVisible(true);
+        }
+    }
+
+    private void saveAllSongs() {
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+
+        StringBuilder allSongsBuilder = new StringBuilder();
+
+        for (Song song : listOfSongs) {
+            allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getCategory()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getDescription()).append(System.lineSeparator());
+            allSongsBuilder.append("----------------------").append(System.lineSeparator());
+        }
+
+        try {
+            Files.write(libraryPath, allSongsBuilder.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Błąd podczas zapisywania dedykacji: " + e.getMessage());
+        }
+    }
+
+
+
+    private void saveSong(Song song) {
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+
+        String songDescription = song.toString().trim();
+
+        try {
+            // Dodanie tekstu na końcu pliku dedications.txtD
+            Files.write(libraryPath, songDescription.getBytes(), StandardOpenOption.APPEND);
+            Notification notification = new Notification("Song saved !", NotificationVariant.LUMO_PRIMARY.ordinal());
+
+        } catch (IOException e) {
+            System.err.println("Wystąpił błąd podczas dodawania tekstu do pliku: " + e.getMessage());
+        }
+
+        listOfSongs.add(song);
+        this.refreshGrid();
+    }
+
+
+    private void removeSong(Song song) {
+        listOfSongs.remove(song);
+        refreshGrid();
+        saveAllSongs(); // <-- nadpisuje cały plik nową wersją
+    }
+
+    public Set<String> loadSongCategories() {
+        categories = new HashSet<>();
+
+        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+
+        // Wczytywanie wszystkich linii z pliku
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(libraryPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Iteracja po liniach, rozdzielając dane w grupach
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).trim();
+
+            // Pomijanie separatorów (linia składająca się z myślników)
+            if (line.matches("-+")) {
+                continue;
+            }
+
+            // Sprawdzamy, czy mamy przynajmniej 4 linie danych w grupie (ID, Tytuł, Wykonawca, Kategoria, Opis)
+            if (i + 3 < lines.size()) {
+                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                categories.add(category);
+                i += 4; // Przechodzimy do następnej grupy (5 linia)
+            }
+        }
+
+        return categories;
     }
 
     public  boolean isMobileDevice() {
         WebBrowser webBrowser = VaadinSession.getCurrent().getBrowser();
         return webBrowser.isAndroid() || webBrowser.isIPhone() || webBrowser.isWindowsPhone();
     }
-
 }

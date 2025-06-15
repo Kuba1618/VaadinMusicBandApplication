@@ -103,7 +103,6 @@ public class LiveView extends VerticalLayout {
             searchPopup.setHeight(imgHeigth * 0.25 + "%");
             searchPopup.setWidth(imgWidth * 0.7 + "%");
         } else if (!isMobileDevice()) {
-            System.out.println("IF DZIAŁA");
             searchPopup.setHeight(imgHeigth * 0.55 + "%");
             searchPopup.setWidth(imgWidth * 0.35 + "%");
         }

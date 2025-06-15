@@ -48,6 +48,7 @@ public class AddDedication extends VerticalLayout {
     private static Div hint = new Div();
     public int width;
     public int height;
+
     public AddDedication(){
 
         width = isMobileDevice() ? 98 : 80;

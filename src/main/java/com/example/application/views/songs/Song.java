@@ -13,7 +13,7 @@ public class Song {
     public File songFile;
 
 
-    public Song() {
+    public Song(String title, String category, String description) {
     }
 
     public Song(String id,String title, String author, String category, String description) {

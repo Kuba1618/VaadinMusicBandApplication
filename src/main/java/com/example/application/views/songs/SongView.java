@@ -129,6 +129,7 @@ public class SongView extends VerticalLayout {
     }
 
     private void shareSong(Song song) {
+
         Notification.show(song.getTitle() + " shared!");
         try {
             //System.out.println(loadSongIdByTitle(song.getTitle()));
