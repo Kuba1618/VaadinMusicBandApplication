@@ -29,7 +29,7 @@ import java.util.*;
 
 @PageTitle("Songs")
 @Route("songs")
-@Menu(order = 1, icon = "line-awesome/svg/heart-solid.svg")
+@Menu(order = 1, icon = "line-awesome/svg/music-solid.svg")
 @RolesAllowed("USER")
 public class SongView extends VerticalLayout {
 

@@ -45,12 +45,12 @@ public class TuningFork extends VerticalLayout {
         horizontalLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
 
         IntegerField integerField = new IntegerField();
-        integerField.setLabel("Speed");
-        integerField.setHelperText("(0 - 100)");
-        integerField.setMin(0);
-        integerField.setMax(100);
-        integerField.setValue(50);
-        integerField.setStep(10);
+        integerField.setLabel("Frequency (Hz)");
+        integerField.setHelperText("(440 - 444)");
+        integerField.setMin(440);
+        integerField.setMax(444);
+        integerField.setValue(442);
+        integerField.setStep(1);
         integerField.setStepButtonsVisible(true);
         horizontalLayout.add(integerField);
 
