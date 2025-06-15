@@ -1,3 +1,5 @@
+**!!! To run it also on a different devices you should run ngrok.exe and enter "ngrok http 8080" !!!**
+
 # MusicBandApp
 
 This project can be used as a starting point to create your own Vaadin application with Spring Boot.
