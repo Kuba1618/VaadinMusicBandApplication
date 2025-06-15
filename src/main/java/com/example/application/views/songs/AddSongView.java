@@ -14,19 +14,23 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
 import jakarta.annotation.security.RolesAllowed;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.logging.Logger;
 
 @PageTitle("Add Song")
 @Route("add-song")
@@ -34,9 +38,13 @@ import java.util.*;
 @RolesAllowed("ADMIN")
 public class AddSongView extends VerticalLayout {
 
+    private File file;
+    private String originalFileName;
+    private String mimeType;
     public Set<String> categories;
     public Set<String> songs;
     public ComboBox<String> songCategoryCmbBox,songCmbBox;
+    Upload uploadSongFile = new Upload(this::receiveUpload);
     public Button saveBtn;
     public TextArea textArea;
     public VerticalLayout layoutColumn2 = new VerticalLayout();
@@ -45,6 +53,8 @@ public class AddSongView extends VerticalLayout {
     private static Div hint = new Div();
     public int width;
     public int height;
+    public int uploadSongBtnWidth;
+    public int uploadSongBtnHeight;
 
     public AddSongView(){
 
@@ -92,6 +102,12 @@ public class AddSongView extends VerticalLayout {
         textArea.setHeight("65%");
         layoutColumn2.add(textArea);
 
+        uploadSongBtnWidth = isMobileDevice() ? 85 : 80;
+        uploadSongBtnHeight = isMobileDevice() ? 30 : 25;
+        uploadSongFile.setWidth(uploadSongBtnWidth + "%");
+        uploadSongFile.setHeight(uploadSongBtnHeight + "%");
+        layoutColumn2.add(uploadSongFile);
+
         saveBtn = new Button("Save");
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         layoutColumn2.setAlignSelf(FlexComponent.Alignment.CENTER, saveBtn);
@@ -116,13 +132,14 @@ public class AddSongView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(1);
         grid.addColumn(Song::getTitle).setHeader("Title").setAutoWidth(true).setFlexGrow(1);
+        grid.addColumn(Song::getAuthor).setHeader("Author").setAutoWidth(true).setFlexGrow(9);
         grid.addColumn(Song::getDescription).setHeader("Description").setAutoWidth(true).setFlexGrow(9);
         grid.addColumn(
                 new ComponentRenderer<>(Button::new, (button, song) -> {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_TERTIARY,
                             ButtonVariant.LUMO_TERTIARY);
-                    button.addClickListener(e -> this.shareSong(song));
+                    button.addClickListener(e -> this.shareSong(song)); //@ToDo TUTAJ wrócić i dokończyć
                     button.setIcon(new Icon(VaadinIcon.SHARE));
                 })).setHeader("Share").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(
@@ -130,7 +147,7 @@ public class AddSongView extends VerticalLayout {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_ERROR,
                             ButtonVariant.LUMO_TERTIARY);
-                    button.addClickListener(e -> this.removeSong(song));
+                    //button.addClickListener(e -> this.removeSong(song)); //@ToDo TUTAJ wrócić i dokończyć
                     button.setIcon(new Icon(VaadinIcon.TRASH));
                 })).setHeader("Delete").setAutoWidth(true).setFlexGrow(0);
 
@@ -151,13 +168,15 @@ public class AddSongView extends VerticalLayout {
             List<String> lines = Files.readAllLines(songsPath);
 
             // Przechodzenie przez linie i tworzenie dedykacji
-            for (int i = 0; i < lines.size(); i += 4) {
-                String title = lines.get(i).trim(); // Pierwsza linia to tytuł
-                String category = lines.get(i + 1).trim(); // Druga linia to kategoria
-                String description = lines.get(i + 2).trim(); // Trzecia linia to opis
+            for (int i = 0; i < lines.size(); i += 6) {
+                String id = lines.get(i).trim(); // Pierwsza linia to id
+                String title = lines.get(i + 1).trim(); // Druga linia to tytuł
+                String author = lines.get(i + 2).trim(); // Trzecia linia to autor
+                String category = lines.get(i + 3).trim(); // Czwarta linia to kategoria
+                String description = lines.get(i + 4).trim(); // Piata linia to opis
 
                 // Tworzenie obiektu Dedication i dodanie go do listy
-                Song song = new Song(title,category, description);
+                Song song = new Song(id,title,author,category, description);
                 songs.add(song);
             }
         } catch (IOException e) {
@@ -215,6 +234,21 @@ public class AddSongView extends VerticalLayout {
         return null;
     }
 
+    public OutputStream receiveUpload(String originalFileName, String MIMEType) {
+        this.originalFileName = originalFileName;
+        this.mimeType = MIMEType;
+        try {
+            // Create a temporary file for example, you can provide your file here.
+            this.file = File.createTempFile("prefix-", "-suffix");
+            file.deleteOnExit();
+            return new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath(), e);
+        } catch (IOException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath() + "'", e);
+        }
+        return null;
+    }
 
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         songs = new HashSet<>();

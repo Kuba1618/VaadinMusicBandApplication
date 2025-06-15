@@ -30,7 +30,7 @@ import java.util.*;
 @PageTitle("Songs")
 @Route("songs")
 @Menu(order = 1, icon = "line-awesome/svg/heart-solid.svg")
-@RolesAllowed("ADMIN")
+@RolesAllowed("USER")
 public class SongView extends VerticalLayout {
 
     public Set<String> categories;
