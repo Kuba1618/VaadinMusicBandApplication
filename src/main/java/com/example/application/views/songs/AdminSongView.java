@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
 import jakarta.annotation.security.RolesAllowed;
@@ -53,6 +55,7 @@ public class AdminSongView extends VerticalLayout {
     private static Div hint = new Div();
     public int width;
     public int height;
+    public Image uploadedImage = new Image();
     public int uploadSongBtnWidth;
     public int uploadSongBtnHeight;
 
@@ -119,6 +122,13 @@ public class AdminSongView extends VerticalLayout {
             textArea.clear();
         });
         layoutColumn2.add(saveBtn);
+
+        uploadedImage.setAlt("Uploaded Image");
+        uploadSongFile.addFileRemovedListener(event -> {
+            uploadedImage.setVisible(false);
+            uploadedImage.setSrc("");
+        });
+        layoutColumn2.add(uploadedImage);
     }
 
     private void setupGrid() {
@@ -238,17 +248,29 @@ public class AdminSongView extends VerticalLayout {
         this.originalFileName = originalFileName;
         this.mimeType = MIMEType;
         try {
-            // Create a temporary file for example, you can provide your file here.
+            // Create a temporary file for the uploaded image
             this.file = File.createTempFile("prefix-", "-suffix");
             file.deleteOnExit();
+
+            // Create a StreamResource from the file
+            StreamResource resource = new StreamResource(originalFileName, () -> {
+                try {
+                    return new FileInputStream(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            });
+
+            // Set the resource as the source of the Image component
+            uploadedImage.setSrc(resource);
             return new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath(), e);
         } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath() + "'", e);
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Failed to create InputStream for: '" + this.file.getAbsolutePath(), e);
         }
         return null;
     }
+
 
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         songs = new HashSet<>();
