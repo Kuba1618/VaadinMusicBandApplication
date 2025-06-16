@@ -124,6 +124,19 @@ public class AdminSongView extends VerticalLayout {
         layoutColumn2.add(saveBtn);
 
         uploadedImage.setAlt("Uploaded Image");
+        uploadSongFile.addSucceededListener(event -> {
+            StreamResource resource = new StreamResource(event.getFileName(), () -> {
+                try {
+                    return new FileInputStream(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            });
+            uploadedImage.setSrc(resource);
+            uploadedImage.setVisible(true);
+        });
+
         uploadSongFile.addFileRemovedListener(event -> {
             uploadedImage.setVisible(false);
             uploadedImage.setSrc("");

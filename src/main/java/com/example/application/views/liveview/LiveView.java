@@ -101,8 +101,8 @@ public class LiveView extends VerticalLayout {
 
     private Dialog setSearchPopupDialog(Dialog searchPopup) {
         if (isMobileDevice()) {
-            searchPopup.setHeight(imgHeigth * 0.25 + "%");
-            searchPopup.setWidth(imgWidth * 0.7 + "%");
+            searchPopup.setHeight(imgHeigth * 0.3 + "%");
+            searchPopup.setWidth(imgWidth * 0.65 + "%");
         } else if (!isMobileDevice()) {
             searchPopup.setHeight(imgHeigth * 0.55 + "%");
             searchPopup.setWidth(imgWidth * 0.35 + "%");
