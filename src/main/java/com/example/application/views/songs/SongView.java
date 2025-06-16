@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @PageTitle("Songs")
@@ -90,7 +91,7 @@ public class SongView extends VerticalLayout {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_ERROR,
                             ButtonVariant.LUMO_TERTIARY);
-                    //button.addClickListener(e -> this.removeSong(song)); //@ToDo TUTAJ wrócić i dokończyć
+                    button.addClickListener(e -> this.removeSong(song)); //@ToDo TUTAJ wrócić i dokończyć
                     button.setIcon(new Icon(VaadinIcon.TRASH));
                 })).setHeader("Delete").setAutoWidth(true).setFlexGrow(0);
 
@@ -137,6 +138,52 @@ public class SongView extends VerticalLayout {
             LiveView.setLiveSongTitle(loadSongIdByTitle(song.getTitle()));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void removeSongFile(String songId) {
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
+        Path filePath = Paths.get(resourcesPath, songId);
+
+        try {
+            boolean deleted = Files.deleteIfExists(filePath);
+            if (deleted) {
+                System.out.println("Plik został usunięty: " + filePath);
+            } else {
+                System.out.println("Plik nie istnieje: " + filePath);
+            }
+        } catch (IOException e) {
+            System.err.println("Błąd podczas usuwania pliku: " + filePath);
+            e.printStackTrace();
+        }
+    }
+
+    private void removeSong(Song song) {
+        removeSongFile(song.getId());
+        listOfSongs.remove(song);
+        refreshGrid();
+        saveAllSongs(); // <-- nadpisuje cały plik nową wersją
+    }
+
+    private void saveAllSongs() {
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
+        Path libraryPath = Paths.get(resourcesPath, "library.txt");
+
+        StringBuilder allSongsBuilder = new StringBuilder();
+
+        for (Song song : listOfSongs) {
+            allSongsBuilder.append(song.getId()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getCategory()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getDescription()).append(System.lineSeparator());
+            allSongsBuilder.append("----------------------").append(System.lineSeparator());
+        }
+
+        try {
+            Files.write(libraryPath, allSongsBuilder.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Błąd podczas zapisywania dedykacji: " + e.getMessage());
         }
     }
 
