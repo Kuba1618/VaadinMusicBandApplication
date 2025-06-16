@@ -60,7 +60,7 @@ public class LiveView extends VerticalLayout {
         imgHeigth = isMobileDevice()? 175 : 97;
 
 
-        img = new Image("songs/" + liveSongTitle, "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
+        img = new Image("/files/" + liveSongTitle, "placeholder plant");//@TODO tu zmienić ścieżkę do pliku było "images/poland.png"
         img.setWidth(imgWidth - 35 + "%");
         img.setHeight(imgHeigth - 2 + "%");
         add(img);
