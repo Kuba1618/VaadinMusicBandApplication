@@ -1,5 +1,6 @@
 package com.example.application.views.liveview;
 
+import com.example.application.PathConstants;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -184,7 +185,7 @@ public class LiveView extends VerticalLayout {
     }
 
     private boolean fileExists(String fileName) {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF.resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path filePath = Paths.get(resourcesPath, fileName);
         return Files.exists(filePath);
     }
@@ -214,7 +215,7 @@ public class LiveView extends VerticalLayout {
     }
 
     public static String loadSongIdByTitle(String songTitle) throws IOException {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
         // Wczytujemy wszystkie linie z pliku
         var lines = Files.readAllLines(libraryPath);
@@ -266,7 +267,7 @@ public class LiveView extends VerticalLayout {
     public Set<String> loadSongCategories() {
         categories = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         // Wczytywanie wszystkich linii z pliku
@@ -300,7 +301,7 @@ public class LiveView extends VerticalLayout {
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         Set<String> songs = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         // Sprawdzanie, czy plik istnieje

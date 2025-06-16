@@ -1,4 +1,5 @@
 package com.example.application.views.songs;
+import com.example.application.PathConstants;
 import com.example.application.views.liveview.LiveView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
@@ -30,13 +31,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.logging.Logger;
 
-@PageTitle("Add Song")
-@Route("add-song")
+@PageTitle("Songs")
+@Route("admin-song")
 @Menu(order = 1, icon = "line-awesome/svg/music-solid.svg")
 @RolesAllowed("ADMIN")
-public class AddSongView extends VerticalLayout {
+public class AdminSongView extends VerticalLayout {
 
     private File file;
     private String originalFileName;
@@ -56,7 +56,7 @@ public class AddSongView extends VerticalLayout {
     public int uploadSongBtnWidth;
     public int uploadSongBtnHeight;
 
-    public AddSongView(){
+    public AdminSongView(){
 
         width = isMobileDevice() ? 98 : 80;
 
@@ -160,7 +160,7 @@ public class AddSongView extends VerticalLayout {
 
     private List<Song> loadDataFromFile() {
         List<Song> songs = new ArrayList<>();
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path songsPath = Paths.get(resourcesPath, "library.txt");
 
         try {
@@ -197,7 +197,7 @@ public class AddSongView extends VerticalLayout {
     }
 
     public static String loadSongIdByTitle(String songTitle) throws IOException {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
         // Wczytujemy wszystkie linie z pliku
         var lines = Files.readAllLines(libraryPath);
@@ -253,7 +253,7 @@ public class AddSongView extends VerticalLayout {
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         songs = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         List<String> lines = null;
@@ -301,7 +301,7 @@ public class AddSongView extends VerticalLayout {
     }
 
     private void saveAllSongs() {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         StringBuilder allSongsBuilder = new StringBuilder();
@@ -323,7 +323,7 @@ public class AddSongView extends VerticalLayout {
 
 
     private void saveSong(Song song) {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         String songDescription = song.toString().trim();
@@ -351,7 +351,7 @@ public class AddSongView extends VerticalLayout {
     public Set<String> loadSongCategories() {
         categories = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         // Wczytywanie wszystkich linii z pliku

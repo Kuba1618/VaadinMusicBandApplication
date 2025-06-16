@@ -1,5 +1,6 @@
 package com.example.application.views.songs;
 
+import com.example.application.PathConstants;
 import com.example.application.views.dedications.Dedication;
 import com.example.application.views.liveview.LiveView;
 import com.vaadin.flow.component.button.Button;
@@ -102,7 +103,7 @@ public class SongView extends VerticalLayout {
 
     private List<Song> loadDataFromFile() {
         List<Song> songs = new ArrayList<>();
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path songsPath = Paths.get(resourcesPath, "library.txt");
 
         try {
@@ -140,7 +141,7 @@ public class SongView extends VerticalLayout {
     }
 
     public static String loadSongIdByTitle(String songTitle) throws IOException {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
         // Wczytujemy wszystkie linie z pliku
         var lines = Files.readAllLines(libraryPath);

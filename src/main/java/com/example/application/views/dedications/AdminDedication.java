@@ -1,5 +1,6 @@
 package com.example.application.views.dedications;
 
+import com.example.application.PathConstants;
 import com.example.application.views.liveview.LiveView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
@@ -12,7 +13,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -21,7 +21,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.io.IOException;
@@ -31,11 +30,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-@PageTitle("Add Dedication")
-@Route("add-dedication")
+@PageTitle("Dedecations")
+@Route("admin-dedication")
 @Menu(order = 1, icon = "line-awesome/svg/heart-solid.svg")
 @RolesAllowed("ADMIN")
-public class AddDedication extends VerticalLayout {
+public class AdminDedication extends VerticalLayout {
 
     public Set<String> categories;
     public Set<String> songs;
@@ -49,7 +48,7 @@ public class AddDedication extends VerticalLayout {
     public int width;
     public int height;
 
-    public AddDedication(){
+    public AdminDedication(){
 
         width = isMobileDevice() ? 98 : 80;
 
@@ -146,7 +145,7 @@ public class AddDedication extends VerticalLayout {
 
     private List<Dedication> loadDataFromFile() {
         List<Dedication> dedications = new ArrayList<>();
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        String resourcesPath = PathConstants.DEDICATIONS;
         Path dedicationsPath = Paths.get(resourcesPath, "dedications.txt");
 
         try {
@@ -181,7 +180,7 @@ public class AddDedication extends VerticalLayout {
     }
 
     public static String loadSongIdByTitle(String songTitle) throws IOException {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
         // Wczytujemy wszystkie linie z pliku
         var lines = Files.readAllLines(libraryPath);
@@ -222,7 +221,7 @@ public class AddDedication extends VerticalLayout {
     public Set<String> loadSongTitlesBasedOnCategorie(String songCategory) {
         songs = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         List<String> lines = null;
@@ -270,7 +269,7 @@ public class AddDedication extends VerticalLayout {
     }
 
     private void saveAllDedications() {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        String resourcesPath = PathConstants.DEDICATIONS;
         Path libraryPath = Paths.get(resourcesPath, "dedications.txt");
 
         StringBuilder allDedicationsBuilder = new StringBuilder();
@@ -292,7 +291,7 @@ public class AddDedication extends VerticalLayout {
 
 
     private void saveDedication(Dedication dedication) {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        String resourcesPath = PathConstants.DEDICATIONS;
         Path libraryPath = Paths.get(resourcesPath, "dedications.txt");
 
         String dedicationDescription = dedication.toString().trim();
@@ -366,7 +365,7 @@ public class AddDedication extends VerticalLayout {
     public Set<String> loadSongCategories() {
         categories = new HashSet<>();
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
 
         // Wczytywanie wszystkich linii z pliku

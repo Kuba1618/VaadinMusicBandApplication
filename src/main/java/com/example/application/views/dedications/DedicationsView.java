@@ -1,5 +1,6 @@
 package com.example.application.views.dedications;
 
+import com.example.application.PathConstants;
 import com.example.application.views.liveview.LiveView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
@@ -105,7 +106,7 @@ public class DedicationsView extends VerticalLayout {
 
     private List<Dedication> loadDataFromFile() {
         List<Dedication> dedications = new ArrayList<>();
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        String resourcesPath = PathConstants.DEDICATIONS;
         Path dedicationsPath = Paths.get(resourcesPath, "dedications.txt");
 
         try {
@@ -142,7 +143,7 @@ public class DedicationsView extends VerticalLayout {
     }
 
     public static String loadSongIdByTitle(String songTitle) throws IOException {
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "songs").toString();
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
         // Wczytujemy wszystkie linie z pliku
         var lines = Files.readAllLines(libraryPath);
@@ -193,7 +194,7 @@ public class DedicationsView extends VerticalLayout {
     private void removeDedication(Dedication dedication) {
         listOfDedications.remove(dedication);
 
-        String resourcesPath = Paths.get("src", "main", "resources", "META-INF", "resources", "dedications").toString();
+        String resourcesPath = PathConstants.DEDICATIONS;
         Path dedicationsPath = Paths.get(resourcesPath, "dedications.txt");
 
         try {
