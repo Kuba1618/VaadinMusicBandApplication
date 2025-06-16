@@ -147,7 +147,7 @@ public class AdminSongView extends VerticalLayout {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,
                             ButtonVariant.LUMO_ERROR,
                             ButtonVariant.LUMO_TERTIARY);
-                    //button.addClickListener(e -> this.removeSong(song)); //@ToDo TUTAJ wrócić i dokończyć
+                    button.addClickListener(e -> this.removeSong(song)); //@ToDo TUTAJ wrócić i dokończyć
                     button.setIcon(new Icon(VaadinIcon.TRASH));
                 })).setHeader("Delete").setAutoWidth(true).setFlexGrow(0);
 
@@ -300,6 +300,24 @@ public class AdminSongView extends VerticalLayout {
         }
     }
 
+    private void removeSongFile(String songId) {
+        String resourcesPath = PathConstants.SONGS_LIBRARY;
+        Path filePath = Paths.get(resourcesPath, songId);
+
+        try {
+            boolean deleted = Files.deleteIfExists(filePath);
+            if (deleted) {
+                System.out.println("Plik został usunięty: " + filePath);
+            } else {
+                System.out.println("Plik nie istnieje: " + filePath);
+            }
+        } catch (IOException e) {
+            System.err.println("Błąd podczas usuwania pliku: " + filePath);
+            e.printStackTrace();
+        }
+    }
+
+
     private void saveAllSongs() {
         String resourcesPath = PathConstants.SONGS_LIBRARY;
         Path libraryPath = Paths.get(resourcesPath, "library.txt");
@@ -307,8 +325,10 @@ public class AdminSongView extends VerticalLayout {
         StringBuilder allSongsBuilder = new StringBuilder();
 
         for (Song song : listOfSongs) {
-            allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getId()).append(System.lineSeparator());
             allSongsBuilder.append(song.getCategory()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
             allSongsBuilder.append(song.getDescription()).append(System.lineSeparator());
             allSongsBuilder.append("----------------------").append(System.lineSeparator());
         }
@@ -329,7 +349,7 @@ public class AdminSongView extends VerticalLayout {
         String songDescription = song.toString().trim();
 
         try {
-            // Dodanie tekstu na końcu pliku dedications.txtD
+            // Dodanie tekstu na końcu pliku dedications.txt
             Files.write(libraryPath, songDescription.getBytes(), StandardOpenOption.APPEND);
             Notification notification = new Notification("Song saved !", NotificationVariant.LUMO_PRIMARY.ordinal());
 
@@ -343,6 +363,7 @@ public class AdminSongView extends VerticalLayout {
 
 
     private void removeSong(Song song) {
+        removeSongFile(song.getId());
         listOfSongs.remove(song);
         refreshGrid();
         saveAllSongs(); // <-- nadpisuje cały plik nową wersją
