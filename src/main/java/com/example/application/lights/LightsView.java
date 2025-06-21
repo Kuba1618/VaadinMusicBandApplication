@@ -20,7 +20,7 @@ import java.net.URL;
 public class LightsView extends VerticalLayout {
 
     // IP Twojego ESP32
-    private final String esp32Ip = "192.168.45.33";
+    private final String esp32Ip = "192.168.51.33";
 
     public LightsView() {
         setAlignItems(Alignment.CENTER);
@@ -32,6 +32,7 @@ public class LightsView extends VerticalLayout {
         Button offButton = new Button("⚫ Zgaś", e -> sendColorCommand("/off"));
 
         add(redButton, greenButton, blueButton, whiteButton, offButton);
+
     }
 
     private void sendColorCommand(String colorPath) {
