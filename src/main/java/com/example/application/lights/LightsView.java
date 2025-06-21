@@ -1,7 +1,6 @@
 package com.example.application.lights;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -20,7 +19,7 @@ import java.net.URL;
 public class LightsView extends VerticalLayout {
 
     // IP Twojego ESP32
-    private final String esp32Ip = "192.168.51.33";
+    private final String esp32Ip = "192.168.51.33"; // Upewnij się, że to prawidłowy IP Twojego ESP32
 
     public LightsView() {
         setAlignItems(Alignment.CENTER);
@@ -30,8 +29,10 @@ public class LightsView extends VerticalLayout {
         Button blueButton = new Button("🔵 Niebieski", e -> sendColorCommand("/blue"));
         Button whiteButton = new Button("⚪ Biały", e -> sendColorCommand("/white"));
         Button offButton = new Button("⚫ Zgaś", e -> sendColorCommand("/off"));
+        // DODAJ TEN PRZYCISK:
+        Button rainbowButton = new Button("🌈 Tęcza", e -> sendColorCommand("/rainbow"));
 
-        add(redButton, greenButton, blueButton, whiteButton, offButton);
+        add(redButton, greenButton, blueButton, whiteButton, offButton, rainbowButton); // Dodaj nowy przycisk do layoutu
 
     }
 
@@ -42,9 +43,9 @@ public class LightsView extends VerticalLayout {
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
-                Notification.show("Kolor zmieniony: " + colorPath);
+                Notification.show("Wysłano komendę: " + colorPath); // Zmieniono tekst powiadomienia
             } else {
-                Notification.show("Błąd zmiany koloru. Kod: " + responseCode);
+                Notification.show("Błąd wysyłania komendy. Kod: " + responseCode);
             }
         } catch (IOException e) {
             Notification.show("Nie można połączyć się z ESP32: " + e.getMessage());
