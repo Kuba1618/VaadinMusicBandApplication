@@ -158,8 +158,8 @@ public class DedicationsView extends VerticalLayout {
 
             // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
             if (i + 1 < lines.size()) {
-                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
-                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                // Tytuł piosenki znajduje się w linii po ID (linia 4, czyli i+3)
+                String title = lines.get(i + 3).trim(); // Tytuł piosenki
                 String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
 
                 // Logowanie: sprawdzamy, co porównujemy

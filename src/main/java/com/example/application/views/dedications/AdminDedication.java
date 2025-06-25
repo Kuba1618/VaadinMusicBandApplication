@@ -195,8 +195,8 @@ public class AdminDedication extends VerticalLayout {
 
             // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
             if (i + 1 < lines.size()) {
-                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
-                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                // Tytuł piosenki znajduje się w linii po ID (linia 4, czyli i+3)
+                String title = lines.get(i + 3).trim(); // Tytuł piosenki
                 String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
 
                 // Logowanie: sprawdzamy, co porównujemy
@@ -241,8 +241,8 @@ public class AdminDedication extends VerticalLayout {
 
             // Upewnienie się, że mamy wystarczająco dużo linii na przetworzenie grupy
             if (i + 3 < lines.size()) {
-                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
-                String title = lines.get(i+1).trim(); // Pierwsza linia to tytuł
+                String category = lines.get(i + 2).trim(); // Trzecia linia to kategoria
+                String title = lines.get(i+3).trim(); // Czwarta linia to tytuł
 
                 // Jeśli kategoria pasuje, dodajemy tytuł do zbioru
                 if (category.equalsIgnoreCase(songCategory)) {
@@ -339,9 +339,9 @@ public class AdminDedication extends VerticalLayout {
                 continue;
             }
 
-            // Sprawdzamy, czy mamy przynajmniej 4 linie danych w grupie (ID, Tytuł, Wykonawca, Kategoria, Opis)
+            // Sprawdzamy, czy mamy przynajmniej 4 linie danych w grupie (ID, Wykonawca, Kategoria,Tytuł, Opis)
             if (i + 3 < lines.size()) {
-                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                String category = lines.get(i + 2).trim(); // Czwórka to kategoria
                 categories.add(category);
                 i += 4; // Przechodzimy do następnej grupy (5 linia)
             }
