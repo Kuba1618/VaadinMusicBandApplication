@@ -114,9 +114,9 @@ public class SongView extends VerticalLayout {
             // Przechodzenie przez linie i tworzenie dedykacji
             for (int i = 0; i < lines.size(); i += 6) {
                 String id = lines.get(i).trim(); // Pierwsza linia to id
-                String title = lines.get(i + 1).trim(); // Druga linia to tytuł
-                String author = lines.get(i + 2).trim(); // Trzecia linia to autor
-                String category = lines.get(i + 3).trim(); // Czwarta linia to kategoria
+                String author = lines.get(i + 1).trim(); // Druga linia to autor
+                String category = lines.get(i + 2).trim(); // Trzecia linia to kategoria
+                String title = lines.get(i + 3).trim(); // Czwarta linia to tytuł
                 String description = lines.get(i + 4).trim(); // Piata linia to opis
 
                 // Tworzenie obiektu Dedication i dodanie go do listy
@@ -173,9 +173,9 @@ public class SongView extends VerticalLayout {
 
         for (Song song : listOfSongs) {
             allSongsBuilder.append(song.getId()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
             allSongsBuilder.append(song.getCategory()).append(System.lineSeparator());
             allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
-            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
             allSongsBuilder.append(song.getDescription()).append(System.lineSeparator());
             allSongsBuilder.append("----------------------").append(System.lineSeparator());
         }
@@ -203,8 +203,8 @@ public class SongView extends VerticalLayout {
 
             // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
             if (i + 1 < lines.size()) {
-                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
-                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                // Tytuł piosenki znajduje się w linii po ID (linia 4, czyli i+3)
+                String title = lines.get(i + 3).trim(); // Tytuł piosenki
                 String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
 
                 // Logowanie: sprawdzamy, co porównujemy

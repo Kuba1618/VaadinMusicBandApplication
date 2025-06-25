@@ -193,9 +193,9 @@ public class AdminSongView extends VerticalLayout {
             // Przechodzenie przez linie i tworzenie dedykacji
             for (int i = 0; i < lines.size(); i += 6) {
                 String id = lines.get(i).trim(); // Pierwsza linia to id
-                String title = lines.get(i + 1).trim(); // Druga linia to tytuł
-                String author = lines.get(i + 2).trim(); // Trzecia linia to autor
-                String category = lines.get(i + 3).trim(); // Czwarta linia to kategoria
+                String author = lines.get(i + 1).trim(); // Trzecia linia to autor
+                String category = lines.get(i + 2).trim(); // Czwarta linia to kategoria
+                String title = lines.get(i + 3).trim(); // Druga linia to tytuł
                 String description = lines.get(i + 4).trim(); // Piata linia to opis
 
                 // Tworzenie obiektu Dedication i dodanie go do listy
@@ -235,8 +235,8 @@ public class AdminSongView extends VerticalLayout {
 
             // Sprawdzamy, czy jest wystarczająco dużo linii, aby porównać tytuł
             if (i + 1 < lines.size()) {
-                // Tytuł piosenki znajduje się w linii po ID (linia 2, czyli i+1)
-                String title = lines.get(i + 1).trim(); // Tytuł piosenki
+                // Tytuł piosenki znajduje się w linii po ID (linia 4, czyli i+3)
+                String title = lines.get(i + 3).trim(); // Tytuł piosenki
                 String id = lines.get(i).trim(); // ID piosenki znajduje się w bieżącej linii
 
                 // Logowanie: sprawdzamy, co porównujemy
@@ -308,8 +308,8 @@ public class AdminSongView extends VerticalLayout {
 
             // Upewnienie się, że mamy wystarczająco dużo linii na przetworzenie grupy
             if (i + 3 < lines.size()) {
-                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
-                String title = lines.get(i+1).trim(); // Pierwsza linia to tytuł
+                String category = lines.get(i + 2).trim(); // Trzecia to kategoria
+                String title = lines.get(i+3).trim(); // Czwarta linia to tytuł
 
                 // Jeśli kategoria pasuje, dodajemy tytuł do zbioru
                 if (category.equalsIgnoreCase(songCategory)) {
@@ -361,9 +361,9 @@ public class AdminSongView extends VerticalLayout {
 
         for (Song song : listOfSongs) {
             allSongsBuilder.append(song.getId()).append(System.lineSeparator());
+            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
             allSongsBuilder.append(song.getCategory()).append(System.lineSeparator());
             allSongsBuilder.append(song.getTitle()).append(System.lineSeparator());
-            allSongsBuilder.append(song.getAuthor()).append(System.lineSeparator());
             allSongsBuilder.append(song.getDescription()).append(System.lineSeparator());
             allSongsBuilder.append("----------------------").append(System.lineSeparator());
         }
@@ -429,7 +429,7 @@ public class AdminSongView extends VerticalLayout {
 
             // Sprawdzamy, czy mamy przynajmniej 4 linie danych w grupie (ID, Tytuł, Wykonawca, Kategoria, Opis)
             if (i + 3 < lines.size()) {
-                String category = lines.get(i + 3).trim(); // Czwórka to kategoria
+                String category = lines.get(i + 2).trim(); // Trzecia linia to kategoria
                 categories.add(category);
                 i += 4; // Przechodzimy do następnej grupy (5 linia)
             }

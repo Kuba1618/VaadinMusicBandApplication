@@ -1,15 +1,15 @@
 #include <WiFi.h>
 
 // ?? Dane Twojego hotspotu (np. z telefonu)
-const char* ssid = "ESP_TEST";       // <-- zmie里 na swoj? nazw? sieci
-const char* password = "12345678";   // <-- zmie里 na swoje has?o
+const char* ssid = "ESP_TEST";       // <-- zmie?? na swoj? nazw? sieci
+const char* password = "12345678";   // <-- zmie?? na swoje has?o
 
 const int redPin = 14;
 const int greenPin = 13;
 const int bluePin = 12;
 
 // Korekcja gamma dla percepcji jasno?ci
-const float GAMMA_CORRECTION_FACTOR = 2.8; // Typowa warto?? dla LED車w (2.2 do 2.8)
+const float GAMMA_CORRECTION_FACTOR = 2.8; // Typowa warto?? dla LED??w (2.2 do 2.8)
 
 // Zmienne do kontroli trybu t?czy
 bool rainbowModeActive = false;
@@ -29,7 +29,7 @@ unsigned long bezierStartTime = 0;
 const unsigned long bezierDuration = 5000; // Czas trwania jednej pe?nej animacji Beziera w milisekach (np. 5 sekund)
 // Punkty kontrolne dla Hue (barwy) dla krzywej Beziera trzeciego stopnia
 float bezierP0 = 0.0;   // Start Hue (np. czerwony)
-float bezierP1 = 90.0;  // Kontrolny punkt 1 (np. ?車?ty/zielony)
+float bezierP1 = 90.0;  // Kontrolny punkt 1 (np. ????ty/zielony)
 float bezierP2 = 180.0; // Kontrolny punkt 2 (np. zielony/cyjan)
 float bezierP3 = 270.0; // End Hue (np. niebieski/purpurowy)
 
@@ -38,7 +38,7 @@ bool colorStrobeModeActive = false;
 unsigned long lastColorStrobeChangeTime = 0;
 int colorStrobeInterval = 150; // Domy?lny interwa? dla kolorowego stroboskopu (ms)
 int currentColorStrobeIndex = 0; // Indeks aktualnego koloru w sekwencji
-// Definiowanie kolor車w dla stroboskopu (RGB)
+// Definiowanie kolor??w dla stroboskopu (RGB)
 const int NUM_STROBE_COLORS = 3;
 const int strobeColors[NUM_STROBE_COLORS][3] = {
   {255, 0, 0},   // Czerwony
@@ -47,11 +47,11 @@ const int strobeColors[NUM_STROBE_COLORS][3] = {
 };
 
 
-// Zmienne do pomiaru op車?nie里
-const int MAX_DELAY_MEASUREMENTS = 20; // Ile ostatnich pomiar車w przechowujemy
+// Zmienne do pomiaru op???nie??
+const int MAX_DELAY_MEASUREMENTS = 20; // Ile ostatnich pomiar??w przechowujemy
 long delayMeasurements[MAX_DELAY_MEASUREMENTS];
 int measurementIndex = 0; // Aktualny indeks w buforze
-bool measuringDelay = false; // Flaga, czy obecnie mierzymy op車?nienie
+bool measuringDelay = false; // Flaga, czy obecnie mierzymy op???nienie
 unsigned long commandReceiveTime = 0; // Czas odebrania komendy HTTP
 
 WiFiServer server(80);
@@ -71,12 +71,12 @@ void setup() {
     }
   }
 
-  // ?? Ustawienie pin車w jako wyj?cia
+  // ?? Ustawienie pin??w jako wyj?cia
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
 
-  // ?? Pr車ba po??czenia z WiFi
+  // ?? Pr??ba po??czenia z WiFi
   WiFi.begin(ssid, password);
   Serial.print("??czenie z WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -89,7 +89,7 @@ void setup() {
 
   server.begin();
 
-  // Inicjalizacja tablicy pomiar車w zerami
+  // Inicjalizacja tablicy pomiar??w zerami
   for (int i = 0; i < MAX_DELAY_MEASUREMENTS; i++) {
     delayMeasurements[i] = 0;
   }
@@ -151,13 +151,13 @@ void setRgbColor(int r, int g, int b) {
   analogWrite(greenPin, applyGammaCorrection(g));
   analogWrite(bluePin, applyGammaCorrection(b));
 
-  // Je?li trwa pomiar op車?nienia i w?a?nie zmienili?my kolor, zapisz op車?nienie
+  // Je?li trwa pomiar op???nienia i w?a?nie zmienili?my kolor, zapisz op???nienie
   if (measuringDelay) {
     long delayMs = millis() - commandReceiveTime;
     delayMeasurements[measurementIndex] = delayMs;
     measurementIndex = (measurementIndex + 1) % MAX_DELAY_MEASUREMENTS; // Przejd? do nast?pnego indeksu, zawijaj?c
-    measuringDelay = false; // Zako里cz pomiar dla tego cyklu
-    Serial.print("Zmierzono op車?nienie: ");
+    measuringDelay = false; // Zako??cz pomiar dla tego cyklu
+    Serial.print("Zmierzono op???nienie: ");
     Serial.println(delayMs);
   }
 }
@@ -184,7 +184,7 @@ void loop() {
       }
     }
     
-    // Zresetuj flag? pomiaru op車?nie里 przed sprawdzeniem komend
+    // Zresetuj flag? pomiaru op???nie?? przed sprawdzeniem komend
     measuringDelay = false;
 
     // Wy??cz wszystkie tryby animacji, je?li odebrano komend? sta?ego koloru
@@ -272,9 +272,9 @@ void loop() {
         Serial.println("Nieprawid?owy interwa? stroboskopu (kolorowego). Zakres: 10-1000.");
       }
     }
-    // Endpoint do pobierania danych o op車?nieniach
+    // Endpoint do pobierania danych o op???nieniach
     else if (req.indexOf("/getDelayData") > 0) {
-      Serial.println("Wys?anie danych o op車?nieniach.");
+      Serial.println("Wys?anie danych o op???nieniach.");
       client.println("HTTP/1.1 200 OK");
       client.println("Content-Type: text/plain");
       client.println();
@@ -283,12 +283,12 @@ void loop() {
         client.println(delayMeasurements[i]);
       }
       client.stop();
-      Serial.println("Po??czenie zako里czone.");
+      Serial.println("Po??czenie zako??czone.");
       return;
     }
 
 
-    // Domy?lna strona HTML dla innych ??da里
+    // Domy?lna strona HTML dla innych ??da??
     client.println("HTTP/1.1 200 OK");
     client.println("Content-Type: text/html");
     client.println();
@@ -302,13 +302,13 @@ void loop() {
     client.println("<p><a href=\"/strobe\">? Stroboskop (bia?y)</a></p>");
     client.println("<p><a href=\"/colorStrobe\">? Stroboskop (kolorowy)</a></p>"); // NOWY PRZYCISK
     client.println("<p><a href=\"/bezier\">?? Krzywa Beziera (3 st.)</a></p>");
-    client.println("<p><a href=\"/getDelayData\">?? Pobierz dane o op車?nieniach</a></p>");
+    client.println("<p><a href=\"/getDelayData\">?? Pobierz dane o op???nieniach</a></p>");
     
     client.stop();
-    Serial.println("Po??czenie zako里czone.");
+    Serial.println("Po??czenie zako??czone.");
   }
 
-  // Obs?uga tryb車w animacji
+  // Obs?uga tryb??w animacji
   if (rainbowModeActive) {
     unsigned long currentTime = millis();
     if (currentTime - lastColorChangeTime >= hueChangeSpeed) {
